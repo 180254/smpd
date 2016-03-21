@@ -1,3 +1,5 @@
+package pr;
+
 import Jama.Matrix;
 
 import javax.swing.*;
@@ -406,9 +408,22 @@ public class PR_GUI extends javax.swing.JFrame {
 
     private void b_TrainActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_b_TrainActionPerformed
 
-        // first step: split dataset (in new feature space) into training / testing parts
         if (FNew == null) return; // no reduced feature space have been derived
-        Classifier Cl = new Classifier();
+        Classifier Cl = null;
+
+        // 208316
+        switch (jComboBox2.getSelectedIndex()) {
+            // "Nearest neighbor (NN)"
+            case 0:
+                // "Nearest Mean (NM)"
+            case 1:
+                // "k-Nearest Neighbor (k-NN)"
+            case 2:
+                // "k-Nearest Mean (k-NM)"}
+            case 3:
+        }
+
+        // first step: split dataset (in new feature space) into training / testing parts
         Cl.generateTraining_and_Test_Sets(FNew, tf_TrainSetSize.getText());
 
     }//GEN-LAST:event_b_TrainActionPerformed
@@ -667,53 +682,5 @@ public class PR_GUI extends javax.swing.JFrame {
     private double[][] projectSamples(Matrix FOld, Matrix TransformMat) {
 
         return (FOld.transpose().times(TransformMat)).transpose().getArrayCopy();
-    }
-}
-
-
-class Classifier {
-
-    double[][] TrainingSet, TestSet;
-    int[] ClassLabels;
-    final int TRAIN_SET = 0, TEST_SET = 1;
-
-    void generateTraining_and_Test_Sets(double[][] Dataset, String TrainSetSize) {
-
-        int[] Index = new int[Dataset[0].length];
-        double Th = Double.parseDouble(TrainSetSize) / 100.0;
-        int TrainCount = 0, TestCount = 0;
-        for (int i = 0; i < Dataset[0].length; i++)
-            if (Math.random() <= Th) {
-                Index[i] = TRAIN_SET;
-                TrainCount++;
-            } else {
-                Index[i] = TEST_SET;
-                TestCount++;
-            }
-        TrainingSet = new double[Dataset.length][TrainCount];
-        TestSet = new double[Dataset.length][TestCount];
-        TrainCount = 0;
-        TestCount = 0;
-        // label vectors for training/test sets
-        for (int i = 0; i < Index.length; i++) {
-            if (Index[i] == TRAIN_SET) {
-                System.arraycopy(Dataset[i], 0, TrainingSet[TrainCount++], 0, Dataset[0].length);
-            } else
-                System.arraycopy(Dataset[i], 0, TestSet[TestCount++], 0, Dataset[0].length);
-        }
-    }
-
-    protected void trainClissifier(double[][] TrainSet) {
-
-    }
-
-}
-
-class NNClassifier extends Classifier {
-
-
-    @Override
-    protected void trainClissifier(double[][] TrainSet) {
-
     }
 }
