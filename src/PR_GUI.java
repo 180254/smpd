@@ -7,6 +7,7 @@ import java.io.File;
 import java.io.FileReader;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.IntStream;
 
 /*
  * To change this template, choose Tools | Templates
@@ -182,7 +183,7 @@ public class PR_GUI extends javax.swing.JFrame {
         jLabel6.setBounds(178, 9, 78, 16);
 
         selbox_nfeat.setModel(new javax.swing.DefaultComboBoxModel(new String[]{"1"}));
-        selbox_nfeat.setEnabled(false);
+        selbox_nfeat.setEnabled(true);
         jPanel3.add(selbox_nfeat);
         selbox_nfeat.setBounds(268, 6, 34, 22);
         jPanel3.add(jSeparator1);
@@ -366,6 +367,12 @@ public class PR_GUI extends javax.swing.JFrame {
             if (InData != null) {
                 getDatasetParameters();
                 l_nfeatures.setText(FeatureCount + "");
+
+                String[] fsDimensions = IntStream.rangeClosed(1, FeatureCount)
+                        .mapToObj(String::valueOf)
+                        .toArray(String[]::new);
+                selbox_nfeat.setModel(new DefaultComboBoxModel<>(fsDimensions));
+
                 fillFeatureMatrix();
             }
         } catch (Exception ex) {
