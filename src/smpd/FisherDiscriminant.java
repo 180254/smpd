@@ -1,6 +1,5 @@
 package smpd;
 
-import pr.Classifier;
+public class FisherDiscriminant {
 
-public class FisherDiscriminant extends Classifier {
 }

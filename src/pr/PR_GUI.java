@@ -1,6 +1,8 @@
 package pr;
 
 import Jama.Matrix;
+import smpd.NearestNeighbour;
+import smpd.Utils;
 
 import javax.swing.*;
 import javax.swing.filechooser.FileNameExtensionFilter;
@@ -27,11 +29,12 @@ import java.util.stream.IntStream;
  */
 public class PR_GUI extends javax.swing.JFrame {
 
-    String InData; // dataset from a text file will be placed here
-    int ClassCount = 0, FeatureCount = 0;
-    double[][] F, FNew; // original feature matrix and transformed feature matrix
-    int[] ClassLabels, SampleCount;
-    String[] ClassNames;
+    private String InData; // dataset from a text file will be placed here
+    private int FeatureCount = 0;
+
+    private double[][] DataSet_N, DataSetNew_N; // original feature matrix and transformed feature matrix
+    private int[] ClassLabels, SampleCount;
+    private String[] ClassNames;
 
     /**
      * Creates new form PR_GUI
@@ -304,6 +307,8 @@ public class PR_GUI extends javax.swing.JFrame {
         b_Train.setBounds(40, 130, 98, 25);
 
         jButton4.setText("Execute");
+        jButton4.addActionListener(this::b_ExecuteActionPerformed);
+
         jPanel4.add(jButton4);
         jButton4.setBounds(210, 130, 96, 25);
 
@@ -385,48 +390,67 @@ public class PR_GUI extends javax.swing.JFrame {
 
     private void b_deriveFSActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_b_deriveFSActionPerformed
         // derive optimal feature space
-        if (F == null) return;
+        if (DataSet_N == null) return;
         if (f_rb_sel.isSelected()) {
             // the chosen strategy is feature selection
             int[] flags = new int[FeatureCount];
             selectFeatures(flags, Integer.parseInt((String) selbox_nfeat.getSelectedItem()));
+
+            // 208316
+            // W l_FLD_winner jest lista wybranych cech oddzielona przecinkami
+            // Obcinamy tabele z listami cech tylko do tych wybranych
+            int[] bestFeatures = Utils.splitToNumbers(l_FLD_winner.getText());
+            DataSetNew_N = Utils.extractFeatures(DataSet_N, bestFeatures);
+
         } else if (f_rb_extr.isSelected()) {
             double TotEnergy = Double.parseDouble(tf_PCA_Energy.getText()) / 100.0;
             // Target dimension (if k>0) or flag for energy-based dimension (k=0)
             int k = 0;
 //            double[][] FF = { {1,1}, {1,2}};
 //            double[][] FF = { {-2,0,2}, {-1,0,1}};
-            // F is an array of initial features, FNew is the resulting array
-            double[][] FFNorm = centerAroundMean(F);
+            // DataSet_N is an array of initial features, DataSetNew_N is the resulting array
+            double[][] FFNorm = centerAroundMean(DataSet_N);
             Matrix Cov = computeCovarianceMatrix(FFNorm);
             Matrix TransformMat = extractFeatures(Cov, TotEnergy, k);
-            FNew = projectSamples(new Matrix(FFNorm), TransformMat);
-            // FNew is a matrix with samples projected to a new feature space
-            l_NewDim.setText(FNew.length + "");
+            DataSetNew_N = projectSamples(new Matrix(FFNorm), TransformMat);
+            // DataSetNew_N is a matrix with samples projected to a new feature space
+            l_NewDim.setText(DataSetNew_N.length + "");
         }
     }//GEN-LAST:event_b_deriveFSActionPerformed
 
+    Classifier classifier = null;
+
     private void b_TrainActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_b_TrainActionPerformed
 
-        if (FNew == null) return; // no reduced feature space have been derived
-        Classifier Cl = null;
+        if (DataSetNew_N == null) return; // no reduced feature space have been derived
 
-        // 208316
+
+        // 208316, odpowiedni nauczyciel w zaleznosci od tego co zostalo wybrane
         switch (jComboBox2.getSelectedIndex()) {
             // "Nearest neighbor (NN)"
             case 0:
+                classifier = new NearestNeighbour();
+
                 // "Nearest Mean (NM)"
             case 1:
+
                 // "k-Nearest Neighbor (k-NN)"
             case 2:
+
                 // "k-Nearest Mean (k-NM)"}
             case 3:
         }
 
         // first step: split dataset (in new feature space) into training / testing parts
-        Cl.generateTraining_and_Test_Sets(FNew, tf_TrainSetSize.getText());
+        classifier.generateTrainingAndTestSets(DataSetNew_N, ClassLabels, Double.parseDouble(tf_TrainSetSize.getText()));
+        classifier.trainClassifier();
 
     }//GEN-LAST:event_b_TrainActionPerformed
+
+    private void b_ExecuteActionPerformed(java.awt.event.ActionEvent evt) {
+        double test = classifier.testClassifier();
+        System.out.println(String.format("Skutecznosc: %.4f", test));
+    }
 
     /**
      * @param args the command line arguments
@@ -561,15 +585,15 @@ public class PR_GUI extends javax.swing.JFrame {
         for (int i = 0; i < SampleCount.length; i++)
             n += SampleCount[i];
         if (n <= 0) throw new Exception("no samples found");
-        F = new double[FeatureCount][n]; // samples are placed column-wise
+        DataSet_N = new double[FeatureCount][n]; // samples are placed column-wise
         for (int j = 0; j < n; j++) {
             saux = stmp.substring(0, stmp.indexOf('$'));
             saux = saux.substring(stmp.indexOf(',') + 1);
             for (int i = 0; i < FeatureCount - 1; i++) {
-                F[i][j] = Double.parseDouble(saux.substring(0, saux.indexOf(',')));
+                DataSet_N[i][j] = Double.parseDouble(saux.substring(0, saux.indexOf(',')));
                 saux = saux.substring(saux.indexOf(',') + 1);
             }
-            F[FeatureCount - 1][j] = Double.parseDouble(saux);
+            DataSet_N[FeatureCount - 1][j] = Double.parseDouble(saux);
             stmp = stmp.substring(stmp.indexOf('$') + 1);
         }
         int cc = 1;
@@ -582,7 +606,7 @@ public class PR_GUI extends javax.swing.JFrame {
             double FLD = 0, tmp;
             int max_ind = -1;
             for (int i = 0; i < FeatureCount; i++) {
-                if ((tmp = computeFisherLD(F[i])) > FLD) {
+                if ((tmp = computeFisherLD(DataSet_N[i])) > FLD) {
                     FLD = tmp;
                     max_ind = i;
                 }
