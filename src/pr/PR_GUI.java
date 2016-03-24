@@ -1,8 +1,10 @@
 package pr;
 
 import Jama.Matrix;
-import smpd.NearestNeighbour;
-import smpd.Utils;
+import classifier.Classifier;
+import classifier.NearestMean;
+import classifier.NearestNeighbour;
+import utils.Utils;
 
 import javax.swing.*;
 import javax.swing.filechooser.FileNameExtensionFilter;
@@ -35,6 +37,8 @@ public class PR_GUI extends javax.swing.JFrame {
     private double[][] DataSet_N, DataSetNew_N; // original feature matrix and transformed feature matrix
     private int[] ClassLabels, SampleCount;
     private String[] ClassNames;
+
+    long TimeStart, TimeStop;
 
     /**
      * Creates new form PR_GUI
@@ -399,8 +403,8 @@ public class PR_GUI extends javax.swing.JFrame {
             // 208316
             // W l_FLD_winner jest lista wybranych cech oddzielona przecinkami
             // Obcinamy tabele z listami cech tylko do tych wybranych
-            int[] bestFeatures = Utils.splitToNumbers(l_FLD_winner.getText());
-            DataSetNew_N = Utils.extractFeatures(DataSet_N, bestFeatures);
+            int[] bestFeatures = Utils.split_to_numbers(l_FLD_winner.getText());
+            DataSetNew_N = Utils.extract_rows(DataSet_N, bestFeatures);
 
         } else if (f_rb_extr.isSelected()) {
             double TotEnergy = Double.parseDouble(tf_PCA_Energy.getText()) / 100.0;
@@ -423,17 +427,19 @@ public class PR_GUI extends javax.swing.JFrame {
     private void b_TrainActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_b_TrainActionPerformed
 
         if (DataSetNew_N == null) return; // no reduced feature space have been derived
-
+        TimeStart = System.currentTimeMillis();
 
         // 208316, odpowiedni nauczyciel w zaleznosci od tego co zostalo wybrane
         switch (jComboBox2.getSelectedIndex()) {
             // "Nearest neighbor (NN)"
             case 0:
                 classifier = new NearestNeighbour();
-
-                // "Nearest Mean (NM)"
+                System.out.println("Ustawiono NearestNeighbour");
+                break;
             case 1:
-
+                System.out.println("Ustawiono NearestMean");
+                classifier = new NearestMean();
+                break;
                 // "k-Nearest Neighbor (k-NN)"
             case 2:
 
@@ -442,14 +448,20 @@ public class PR_GUI extends javax.swing.JFrame {
         }
 
         // first step: split dataset (in new feature space) into training / testing parts
-        classifier.generateTrainingAndTestSets(DataSetNew_N, ClassLabels, Double.parseDouble(tf_TrainSetSize.getText()));
+        classifier.generateTrainingAndTestSets(DataSetNew_N, ClassLabels, Double.parseDouble(tf_TrainSetSize.getText()), ClassNames);
         classifier.trainClassifier();
+
+        TimeStop = System.currentTimeMillis();
+        System.out.println(String.format("Trening zakonczono. %.3fs", (TimeStop - TimeStart) / 1000.0));
 
     }//GEN-LAST:event_b_TrainActionPerformed
 
     private void b_ExecuteActionPerformed(java.awt.event.ActionEvent evt) {
+        TimeStart = System.currentTimeMillis();
         double test = classifier.testClassifier();
-        System.out.println(String.format("Skutecznosc: %.4f", test));
+        TimeStop = System.currentTimeMillis();
+
+        System.out.println(String.format("Skutecznosc: %.4f / czas: %.3fs", test, (TimeStop - TimeStart) / 1000.0));
     }
 
     /**

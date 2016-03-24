@@ -1,16 +1,19 @@
-package pr;
+package classifier;
 
-import smpd.Utils;
+import utils.Matrix;
 
 public abstract class Classifier {
+
+    String[] ClassNames;
 
     protected double[][] TrainingSet_N, TestSet_N;
     protected double[][] TrainingSet_T, TestSet_T;
     protected int[] TrainingLabels_T, TestLabels_T;
 
-    void generateTrainingAndTestSets(double[][] Dataset_N, int[] DataSetLabels_T, double TrainSetSize) {
+    public void generateTrainingAndTestSets(double[][] Dataset_N, int[] DataSetLabels_T, double TrainSetSize, String[] classNames) {
+        this.ClassNames = classNames;
 
-        double[][] Dataset_T = Utils.transpose(Dataset_N);
+        double[][] Dataset_T = Matrix.transpose(Dataset_N);
         // Dataset_N.length = liczba cech
         // Dataset_T.length = liczba probek
 
@@ -43,23 +46,21 @@ public abstract class Classifier {
         for (int i = 0; i < Index.length; i++) {
             if (Index[i] == TRAIN_SET) {
                 TrainingLabels_T[TrainCount] = DataSetLabels_T[i];
-                TrainingSet_T[TrainCount] = new double[Dataset_N.length];
                 System.arraycopy(Dataset_T[i], 0, TrainingSet_T[TrainCount], 0, Dataset_N.length);
                 TrainCount++;
 
             } else {
                 TestLabels_T[TestCount] = DataSetLabels_T[i];
-                TestSet_T[TestCount] = new double[Dataset_N.length];
                 System.arraycopy(Dataset_T[i], 0, TestSet_T[TestCount], 0, Dataset_N.length);
                 TestCount++;
             }
         }
 
-        TrainingSet_N = Utils.transpose(TrainingSet_T);
-        TestSet_N = Utils.transpose(TestSet_T);
+        TrainingSet_N = Matrix.transpose(TrainingSet_T);
+        TestSet_N = Matrix.transpose(TestSet_T);
     }
 
-    protected abstract void trainClassifier();
+    public abstract void trainClassifier();
 
-    protected abstract double testClassifier();
+    public abstract double testClassifier();
 }
