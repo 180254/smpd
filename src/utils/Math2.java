@@ -1,5 +1,9 @@
 package utils;
 
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.TreeSet;
 import java.util.stream.DoubleStream;
 
 /**
@@ -13,7 +17,7 @@ public class Math2 {
     /**
      * Indeks w tablicy liczby o najmniejszej wartosci.
      * numbers = {3, 4, 88, 1, 2}
-     * wynik = 4
+     * wynik = 3
      */
     public static int argMin(double[] numbers) {
         int min = 0;
@@ -24,6 +28,41 @@ public class Math2 {
         }
 
         return min;
+    }
+
+    /**
+     * Indeksy w tablicy liczb o k-najmniejszych wartosciach.
+     * numbers = {3, 4, 88, 1, 2}
+     * k = 3
+     * wynik = {3, 4, 0}
+     */
+    public static int[] argMin(double[] numbers, int k) {
+        TreeSet<Integer> topK =
+                new TreeSet<>((o1, o2) -> Double.compare(numbers[o1], numbers[o2]));
+
+        for (int i = 0; i < numbers.length; i++) {
+            topK.add(i);
+        }
+
+        return topK.stream().limit(k).mapToInt(i -> i).toArray();
+    }
+
+    /**
+     * Najczesciej wystepujaca wartosc w tablicy.
+     * array = {3, 5, 3, 3, 5}
+     * wynik = 3
+     */
+    public static int mostPopular(int[] array) {
+        Map<Integer, Integer> mapValueToCount = new HashMap<>();
+        for (int i : array) {
+            Integer count = mapValueToCount.get(i);
+            mapValueToCount.put(i, count != null ? count + 1 : 0);
+        }
+
+        return Collections.max(
+                mapValueToCount.entrySet(),
+                (o1, o2) -> o1.getValue().compareTo(o2.getValue())
+        ).getKey();
     }
 
     /**

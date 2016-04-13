@@ -58,6 +58,12 @@ public abstract class Classifier {
 
         TrainingSet_N = Matrix.transpose(TrainingSet_T);
         TestSet_N = Matrix.transpose(TestSet_T);
+
+        System.out.printf("TrainingSet_T.length = %d (%.0f%%)%n",
+                TrainingSet_T.length,
+                TrainingSet_T.length / (double) Dataset_T.length*100);
+        System.out.println("TestSet_T.length = " + TestSet_T.length);
+        System.out.println("TrainingSet/TestSet_N.length = " + TrainingSet_N.length);
     }
 
     public abstract void trainClassifier();

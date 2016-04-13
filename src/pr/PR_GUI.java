@@ -2,6 +2,7 @@ package pr;
 
 import Jama.Matrix;
 import classifier.Classifier;
+import classifier.KNearestNeighbour;
 import classifier.NearestMean;
 import classifier.NearestNeighbour;
 import utils.Utils;
@@ -430,6 +431,7 @@ public class PR_GUI extends javax.swing.JFrame {
         TimeStart = System.currentTimeMillis();
 
         // 208316, odpowiedni nauczyciel w zaleznosci od tego co zostalo wybrane
+        System.out.println("----------------------------------------------------");
         switch (jComboBox2.getSelectedIndex()) {
             // "Nearest neighbor (NN)"
             case 0:
@@ -440,10 +442,13 @@ public class PR_GUI extends javax.swing.JFrame {
                 System.out.println("Ustawiono NearestMean");
                 classifier = new NearestMean();
                 break;
-                // "k-Nearest Neighbor (k-NN)"
             case 2:
+                classifier = new KNearestNeighbour();
+                System.out.println("Ustawiono K-NearestNeighbour");
+                break;
 
-                // "k-Nearest Mean (k-NM)"}
+
+            // "k-Nearest Mean (k-NM)"}
             case 3:
         }
 
