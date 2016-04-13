@@ -186,6 +186,8 @@ public class Math2 {
     public static double[][] covariance(double[][] dataset_n, double[][] means_n) {
         double[][] datasetCAM_n = center_around_mean(dataset_n, means_n);
         double[][] datasetCAM_t = Matrix.transpose(datasetCAM_n);
-        return Matrix.multiply(datasetCAM_n, datasetCAM_t);
+        double[][] multiply = Matrix.multiply(datasetCAM_n, datasetCAM_t);
+        return Matrix.multiply(multiply, 1.0 / dataset_n.length);
+
     }
 }

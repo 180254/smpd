@@ -44,6 +44,14 @@ public class Matrix {
     }
 
     /**
+     * Mnozenie macierzy.
+     */
+    public static double[][] multiply(double[][] matrix1, double scalar) {
+        return new Jama.Matrix(matrix1).times(scalar).getArray();
+    }
+
+
+    /**
      * Kopia macierzy (dla zachowania zasady immutable).
      */
     public static double[][] copy(double[][] matrix) {
