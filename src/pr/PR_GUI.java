@@ -1,11 +1,8 @@
 package pr;
 
 import Jama.Matrix;
-import classifier.Classifier;
-import classifier.KNearestNeighbour;
-import classifier.NearestMean;
-import classifier.NearestNeighbour;
-import utils.Utils;
+import classifier.*;
+import utils.Utils2;
 
 import javax.swing.*;
 import javax.swing.filechooser.FileNameExtensionFilter;
@@ -404,8 +401,8 @@ public class PR_GUI extends javax.swing.JFrame {
             // 208316
             // W l_FLD_winner jest lista wybranych cech oddzielona przecinkami
             // Obcinamy tabele z listami cech tylko do tych wybranych
-            int[] bestFeatures = Utils.split_to_numbers(l_FLD_winner.getText());
-            DataSetNew_N = Utils.extract_rows(DataSet_N, bestFeatures);
+            int[] bestFeatures = Utils2.split_to_numbers(l_FLD_winner.getText());
+            DataSetNew_N = Utils2.extract_rows(DataSet_N, bestFeatures);
 
         } else if (f_rb_extr.isSelected()) {
             double TotEnergy = Double.parseDouble(tf_PCA_Energy.getText()) / 100.0;
@@ -446,10 +443,10 @@ public class PR_GUI extends javax.swing.JFrame {
                 classifier = new KNearestNeighbour();
                 System.out.println("Ustawiono K-NearestNeighbour");
                 break;
-
-
-            // "k-Nearest Mean (k-NM)"}
             case 3:
+                classifier = new KNearestMean();
+                System.out.println("Ustawiono K-NearestMean");
+                break;
         }
 
         // first step: split dataset (in new feature space) into training / testing parts

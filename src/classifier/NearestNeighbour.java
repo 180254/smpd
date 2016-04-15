@@ -33,9 +33,9 @@ public class NearestNeighbour extends Classifier {
         double[] distances = new double[TrainingSet_T.length];
 
         for (int i = 0; i < TrainingSet_T.length; i++) {
-            distances[i] = Math2.distanceEuclidean(TrainingSet_T[i], features);
+            distances[i] = Math2.distance_euclidean(TrainingSet_T[i], features);
         }
 
-        return Math2.argMin(distances);
+        return Math2.arg_min(distances);
     }
 }

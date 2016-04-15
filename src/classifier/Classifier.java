@@ -1,6 +1,6 @@
 package classifier;
 
-import utils.Matrix;
+import utils.Matrix2;
 
 public abstract class Classifier {
 
@@ -13,7 +13,7 @@ public abstract class Classifier {
     public void generateTrainingAndTestSets(double[][] Dataset_N, int[] DataSetLabels_T, double TrainSetSize, String[] classNames) {
         this.ClassNames = classNames;
 
-        double[][] Dataset_T = Matrix.transpose(Dataset_N);
+        double[][] Dataset_T = Matrix2.transpose(Dataset_N);
         // Dataset_N.length = liczba cech
         // Dataset_T.length = liczba probek
 
@@ -56,12 +56,12 @@ public abstract class Classifier {
             }
         }
 
-        TrainingSet_N = Matrix.transpose(TrainingSet_T);
-        TestSet_N = Matrix.transpose(TestSet_T);
+        TrainingSet_N = Matrix2.transpose(TrainingSet_T);
+        TestSet_N = Matrix2.transpose(TestSet_T);
 
         System.out.printf("TrainingSet_T.length = %d (%.0f%%)%n",
                 TrainingSet_T.length,
-                TrainingSet_T.length / (double) Dataset_T.length*100);
+                TrainingSet_T.length / (double) Dataset_T.length * 100);
         System.out.println("TestSet_T.length = " + TestSet_T.length);
         System.out.println("TrainingSet/TestSet_N.length = " + TrainingSet_N.length);
     }

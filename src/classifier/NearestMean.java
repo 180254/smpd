@@ -1,8 +1,8 @@
 package classifier;
 
 import utils.Math2;
-import utils.Matrix;
-import utils.Utils;
+import utils.Matrix2;
+import utils.Utils2;
 
 public class NearestMean extends Classifier {
 
@@ -17,15 +17,15 @@ public class NearestMean extends Classifier {
         TrainingSetsCovarianceInv = new double[ClassNames.length][][];
 
         for (int i = 0; i < ClassNames.length; i++) {
-            int[] indexes = Utils.args_for_value(TrainingLabels_T, i);
-            TrainingSets_N[i] = Matrix.transpose(Utils.extract_rows(TrainingSet_T, indexes));
+            int[] indexes = Utils2.args_for_value(TrainingLabels_T, i);
+            TrainingSets_N[i] = Matrix2.transpose(Utils2.extract_rows(TrainingSet_T, indexes));
         }
 
         for (int i = 0; i < ClassNames.length; i++) {
             TrainingSetsMeans_N[i] = Math2.means_n(TrainingSets_N[i]);
 
-            TrainingSetsCovarianceInv[i] = Math2.covariance(TrainingSets_N[i], TrainingSetsMeans_N[i]);
-            TrainingSetsCovarianceInv[i] = Matrix.inverse(TrainingSetsCovarianceInv[i]);
+            TrainingSetsCovarianceInv[i] = Math2.covariance(TrainingSets_N[i]);
+            TrainingSetsCovarianceInv[i] = Matrix2.inverse(TrainingSetsCovarianceInv[i]);
         }
     }
 
@@ -48,12 +48,12 @@ public class NearestMean extends Classifier {
      * wynik = indeks z TrainingSets_N, wskazujacy do ktorej klasy (label( jest najblizej
      */
     private int nearestMean(double[] features) {
-        double[][] point_n = Matrix.transpose(Matrix.to_matrix(features));
+        double[][] point_n = Matrix2.transpose(Matrix2.to_matrix_t(features));
         double[] distances = new double[TrainingSets_N.length];
 
         for (int i = 0; i < TrainingSets_N.length; i++) {
-            distances[i] = Math2.distanceMahalanobis(point_n, TrainingSetsMeans_N[i], TrainingSetsCovarianceInv[i]);
+            distances[i] = Math2.distance_mahalanobis(point_n, TrainingSetsMeans_N[i], TrainingSetsCovarianceInv[i]);
         }
-        return Math2.argMin(distances);
+        return Math2.arg_min(distances);
     }
 }

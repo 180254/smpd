@@ -19,9 +19,11 @@ public class Math2 {
      * numbers = {3, 4, 88, 1, 2}
      * wynik = 3
      */
-    public static int argMin(double[] numbers) {
-        int min = 0;
+    public static int arg_min(double[] numbers) {
+        if (numbers.length == 0)
+            throw new IllegalArgumentException();
 
+        int min = 0;
         for (int i = 1; i < numbers.length; i++) {
             if (numbers[i] < numbers[min])
                 min = i;
@@ -31,12 +33,51 @@ public class Math2 {
     }
 
     /**
+     * Najmniejsza wartość w tablicy.
+     * numbers = {3, 4, 88, 1, 2}
+     * wynik = 1
+     */
+    public static double min(double[] numbers) {
+        return numbers[arg_min(numbers)];
+    }
+
+    /**
+     * Indeks w tablicy liczby o najwiekszej wartoości wartosci.
+     * numbers = {3, 4, 88, 1, 2}
+     * wynik = 2
+     */
+    public static int arg_max(double[] numbers) {
+        if (numbers.length == 0)
+            throw new IllegalArgumentException();
+
+        int min = 0;
+        for (int i = 1; i < numbers.length; i++) {
+            if (numbers[i] > numbers[min])
+                min = i;
+        }
+
+        return min;
+    }
+
+    /**
+     * Największa wartość w tablicy.
+     * numbers = {3, 4, 88, 1, 2}
+     * wynik = 88
+     */
+    public static double max(double[] numbers) {
+        return numbers[arg_max(numbers)];
+    }
+
+    /**
      * Indeksy w tablicy liczb o k-najmniejszych wartosciach.
      * numbers = {3, 4, 88, 1, 2}
      * k = 3
      * wynik = {3, 4, 0}
      */
-    public static int[] argMin(double[] numbers, int k) {
+    public static int[] arg_min(double[] numbers, int k) {
+        if (numbers.length < k)
+            throw new IllegalArgumentException();
+
         TreeSet<Integer> topK =
                 new TreeSet<>((o1, o2) -> Double.compare(numbers[o1], numbers[o2]));
 
@@ -52,7 +93,10 @@ public class Math2 {
      * array = {3, 5, 3, 3, 5}
      * wynik = 3
      */
-    public static int mostPopular(int[] array) {
+    public static int most_popular(int[] array) {
+        if (array.length == 0)
+            throw new IllegalArgumentException();
+
         Map<Integer, Integer> mapValueToCount = new HashMap<>();
         for (int i : array) {
             Integer count = mapValueToCount.get(i);
@@ -69,6 +113,9 @@ public class Math2 {
      * Średnia.
      */
     public static double mean(double[] numbers) {
+        if (numbers.length == 0)
+            throw new IllegalArgumentException();
+
         return DoubleStream.of(numbers).sum() / numbers.length;
     }
 
@@ -76,6 +123,9 @@ public class Math2 {
      * Wariancja.
      */
     public static double variance(double[] numbers) {
+        if (numbers.length == 0)
+            throw new IllegalArgumentException();
+
         double cMean = mean(numbers);
 
         double temp1 = DoubleStream.of(numbers)
@@ -96,7 +146,10 @@ public class Math2 {
     /**
      * Odległość Eklidesowa pomiędzy punktami w przestrzeni N-wymiarowej.
      */
-    public static double distanceEuclidean(double[] point1, double[] point2) {
+    public static double distance_euclidean(double[] point1, double[] point2) {
+        if (point1.length != point2.length || point1.length == 0)
+            throw new IllegalArgumentException();
+
         double temp = 0;
 
         for (int i = 0; i < point1.length; i++) {
@@ -104,6 +157,9 @@ public class Math2 {
             temp += pow;
         }
 
+        if (temp < 0) {
+            int k = 4;
+        }
         return Math.sqrt(temp);
     }
 
@@ -115,13 +171,24 @@ public class Math2 {
      * @param k_covarianceInv odwrocona macierz kowariancji dla klasy K - DxD
      * @return double
      */
-    public static double distanceMahalanobis(double[][] point_n, double[][] k_means_n, double[][] k_covarianceInv) {
-        double[][] x_minus_means_n = Matrix.minus(point_n, k_means_n);
-        double[][] x_minus_means_t = Matrix.transpose(x_minus_means_n);
+    public static double distance_mahalanobis(double[][] point_n, double[][] k_means_n, double[][] k_covarianceInv) {
+        double[][] x_minus_means_n = Matrix2.minus(point_n, k_means_n);
+        double[][] x_minus_means_t = Matrix2.transpose(x_minus_means_n);
 
-        double[][] result1 = Matrix.multiply(x_minus_means_t, k_covarianceInv);
-        double[][] result2 = Matrix.multiply(result1, x_minus_means_n);
+        double[][] result1 = Matrix2.multiply(x_minus_means_t, k_covarianceInv);
+        double[][] result2 = Matrix2.multiply(result1, x_minus_means_n);
         return result2[0][0];
+    }
+
+    /**
+     * Odległość Mahalanobisa pomiędzy punktem a klasą K.
+     */
+    public static double distance_mahalanobis(double[][] point_n, double[][] dataset_n) {
+        double[][] k_means_n = means_n(dataset_n);
+        double[][] k_covariance = covariance(dataset_n);
+        double[][] k_covarianceInv = Matrix2.inverse(k_covariance);
+
+        return distance_mahalanobis(point_n, k_means_n, k_covarianceInv);
     }
 
     /**
@@ -157,37 +224,38 @@ public class Math2 {
      * dataset_n =
      * cecha1 -> 1 | 1 | 2 | 2
      * cecha2 -> 1 | 1 | 3 | 3
-     * cecha3 -> 1 | 1 | 1 | 1
+     * cecha3 -> 1 | 2 | 1 | 2
      * .
      * means_n =
      * cecha1 -> 1.5
      * cecha2 -> 2
-     * cecha3 -> 1
+     * cecha3 -> 1.5
      * .
      * cecha1 -> -0.5 | -0.5 | 0.5 | 0.5
      * cecha2 ->   -1 |   -1 |   1 |  1
-     * cecha3 ->    0 |    0 |   0 |  0
+     * cecha3 -> -0.5 |  0.5 |-0.5 | 0.5
      * wynik =
      */
-    public static double[][] center_around_mean(double[][] dataset_n, double[][] means_n) {
-        double[][] dataset2_n = Matrix.copy(dataset_n);
+    public static double[][] center_around_mean(double[][] dataset_n) {
+        double[][] dataset2_n = Matrix2.copy(dataset_n);
+        double[][] means_n = Math2.means_n(dataset2_n);
 
         for (int i = 0; i < dataset_n.length; i++)
             for (int j = 0; j < dataset_n[0].length; j++)
                 dataset2_n[i][j] -= means_n[i][0];
 
-        return dataset_n;
+        return dataset2_n;
     }
 
     /**
      * Kowariancja danych dataset_n (D1xD2).
      * Średnie means_n (D1x1) przekazane w parametrze dla uniknięcia wielokrotnych obliczeń.
      */
-    public static double[][] covariance(double[][] dataset_n, double[][] means_n) {
-        double[][] datasetCAM_n = center_around_mean(dataset_n, means_n);
-        double[][] datasetCAM_t = Matrix.transpose(datasetCAM_n);
-        double[][] multiply = Matrix.multiply(datasetCAM_n, datasetCAM_t);
-        return Matrix.multiply(multiply, 1.0 / dataset_n.length);
+    public static double[][] covariance(double[][] dataset_n) {
+        double[][] datasetCAM_n = center_around_mean(dataset_n);
+        double[][] datasetCAM_t = Matrix2.transpose(datasetCAM_n);
 
+        double[][] multiply = Matrix2.multiply(datasetCAM_n, datasetCAM_t);
+        return Matrix2.multiply(multiply, 1.0 / (dataset_n[0].length - 1));
     }
 }
