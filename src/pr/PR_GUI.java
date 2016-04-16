@@ -669,7 +669,7 @@ public class PR_GUI extends javax.swing.JFrame {
             double TotEVal = evals.trace(); // total energy
             double EAccum = 0;
             int m = evals.getColumnDimension() - 1;
-            while (EAccum < Ek * TotEVal) {
+            while (EAccum < Ek * TotEVal && m >= 0) {
                 EAccum += evals.get(m, m);
                 m--;
             }
