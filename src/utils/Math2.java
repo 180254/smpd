@@ -157,9 +157,6 @@ public class Math2 {
             temp += pow;
         }
 
-        if (temp < 0) {
-            int k = 4;
-        }
         return Math.sqrt(temp);
     }
 
@@ -177,6 +174,10 @@ public class Math2 {
 
         double[][] result1 = Matrix2.multiply(x_minus_means_t, k_covarianceInv);
         double[][] result2 = Matrix2.multiply(result1, x_minus_means_n);
+
+        if(result2[0][0] < 0) {
+            throw new RuntimeException("distance<0! overflow!?");
+        }
         return result2[0][0];
     }
 
