@@ -59,7 +59,7 @@ public class Utils2Test {
 
     @Test
     public void extract_rows_test_true1() {
-        double[][] dataset_n = {
+        double[][] dataset = {
                 {0, 1, 2, 1},
                 {0, 1, 2, 2},
                 {0, 1, 2, 3},
@@ -72,13 +72,13 @@ public class Utils2Test {
                 {0, 1, 2, 4}
         };
 
-        double[][] result = Utils2.extract_rows(dataset_n, selected_rows);
+        double[][] result = Utils2.extract_rows(dataset, selected_rows);
         Assert.assertTrue(Matrix3.equals(expected, result, 1e-10));
     }
 
     @Test(expected = RuntimeException.class)
     public void extract_rows_test_false1() {
-        double[][] dataset_n = {
+        double[][] dataset = {
                 {0, 1, 2, 1},
                 {0, 1, 2, 2},
                 {0, 1, 2, 3},
@@ -86,7 +86,7 @@ public class Utils2Test {
         };
         int[] selected_rows = {};
 
-        Utils2.extract_rows(dataset_n, selected_rows);
+        Utils2.extract_rows(dataset, selected_rows);
     }
 
 
@@ -262,11 +262,6 @@ public class Utils2Test {
     }
 
     @Test
-    public void inflection_point_test_true1() {
-        throw new UnsupportedOperationException();
-    }
-
-    @Test
     public void empty_lists_ids_test_true1() {
         List<List<String>> data = new ArrayList<>();
         data.add(new ArrayList<>());
@@ -309,5 +304,23 @@ public class Utils2Test {
         int[] expected = {};
         int[] result = Utils2.empty_lists_ids(data);
         Assert.assertArrayEquals(expected, result);
+    }
+
+    @Test
+    public void map_int_arr_test_true1() {
+        int[] arr = {0, 2, 4};
+        int[] mapper = {10, 11, 12, 13, 14, 15};
+        int[] expected = {10, 12, 14};
+
+        int[] result = Utils2.map_int_arr(arr, mapper);
+        Assert.assertArrayEquals(expected, result);
+    }
+
+    @Test(expected = RuntimeException.class)
+    public void map_int_arr_test_false1() {
+        int[] arr = {0, 2, 4100};
+        int[] mapper = {10, 11, 12, 13, 14, 15};
+
+       Utils2.map_int_arr(arr, mapper);
     }
 }

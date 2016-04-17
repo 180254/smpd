@@ -175,7 +175,7 @@ public class Math2 {
         double[][] result1 = Matrix2.multiply(x_minus_means_t, k_covarianceInv);
         double[][] result2 = Matrix2.multiply(result1, x_minus_means_n);
 
-        if(result2[0][0] < 0) {
+        if (result2[0][0] < 0) {
             throw new RuntimeException("distance<0! overflow!?");
         }
         return result2[0][0];
@@ -258,5 +258,27 @@ public class Math2 {
 
         double[][] multiply = Matrix2.multiply(datasetCAM_n, datasetCAM_t);
         return Matrix2.multiply(multiply, 1.0 / (dataset_n[0].length - 1));
+    }
+
+
+    /**
+     * Punkt "przegięcia" funkcji, miejsce gdzie sie normuje. Uzyteczne dla wykresu k od bledu.
+     * Za punkt ten uznaje takie K, dla ktorego osiagane jest 70% całkowitego spadku wartości bledu.
+     * Wartości x są domyślne - od 1 do points_y.length-1
+     * Implementacja zaklada, ze sa conajmniej dwa punkty do wyboru (points_y.length >= 2).
+     */
+    public static int inflection_point(double[] points_y) {
+        final double INFLECTION_PERCENT = 70;
+        double total_diff = points_y[0] - points_y[points_y.length - 1];
+
+        for (int i = 0; i < points_y.length; i++) {
+            double current_diff = points_y[0] - points_y[i];
+
+            double percent = current_diff / total_diff * 100;
+            if (percent >= INFLECTION_PERCENT)
+                return i + 1;
+        }
+
+        throw new RuntimeException();
     }
 }

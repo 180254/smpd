@@ -45,6 +45,8 @@ public class NearestMean extends Classifier {
         // each_class:
         for (int classId = 0; classId < TrainingSets_N.length; classId++) {
 
+            // w przypadku NN (bez k) zakladamy, ze klasa ma jeden mod
+            // srednia i kowariancja jest liczona dla calej klasy
             if (classType == ClassType.ONE) {
                 for (int i = 0; i < ClassNames.length; i++) {
                     double[][] means_n = Math2.means_n(TrainingSets_N[i]);
@@ -56,11 +58,11 @@ public class NearestMean extends Classifier {
                     TrainingSetsCovarianceInv.add(new ArrayList<>());
                     TrainingSetsCovarianceInv.get(classId).add(covarianceInv);
                 }
-                continue; // each_class;
+                continue; // each_class; pomijamy kolejne kroki kierowane do k-NN
             }
 
-            // classType = ClassType = K
-
+            // classType = ClassType = K; pelna procedura
+            // zmienne przechowujace wyliczone wartosci dla kazdego z k
             List<List<double[][]>> K_Mod_Means_N = new ArrayList<>(); // [k_id][mod_id][feature_mean,1]
             List<List<double[][]>> K_Mod_CovariancesInv = new ArrayList<>(); // [k_id][mod_id][cov_inv,cov_inv]
             List<List<List<Integer>>> K_Mod_TrainingIndexes_T = new ArrayList<>(); // [k_id][mod_id] list<indexes>
@@ -148,7 +150,7 @@ public class NearestMean extends Classifier {
                     // sredni popelniony blad
                     double meanError = Mod_Errors.stream().mapToDouble(d -> d).average().orElse(0);
                     // System.out.println(String.format("%.15f", meanError).replace(".", ","));
-                    System.out.println(String.format("c=%d // k=%2d // %.15f // %s",
+                    /* System.out.println(String.format("c=%d // k=%2d // %.15f // %s",
                             classId,
                             cur_k,
                             meanError,
@@ -156,7 +158,7 @@ public class NearestMean extends Classifier {
                                     .map(List::size).map(String::valueOf)
                                     .reduce((s, s2) -> String.format("%3s, %3s", s, s2))
                                     .orElse("")
-                    ));
+                    )); */
 
                     // zapisanie wyniku dla danego k
                     K_Mod_Means_N.add(Mod_Means_N);
@@ -173,7 +175,7 @@ public class NearestMean extends Classifier {
             } // end: kazde k
 
             // policzenie najlepszego k
-            int bestK = Utils2.inflection_point(Utils2.to_dbl_array(K_Mean_Errors));
+            int bestK = Math2.inflection_point(Utils2.to_dbl_array(K_Mean_Errors));
             int bestKi = bestK - K_MIN;
 
             // policzenie efektywnego K
@@ -188,11 +190,11 @@ public class NearestMean extends Classifier {
             int efectiveK = K_Mod_Means_N.get(bestKi).size();
             System.out.printf("c=%d, k=%d, efektywneK = %d%n", classId, bestK, efectiveK);
 
-            // zapisanie srednich i kowariancji dla klasy
+            // zapisanie srednich i kowariancji dla klasy - najlepsze ustalone K
             TrainingSetsMeans_N.add(K_Mod_Means_N.get(bestKi));
             TrainingSetsCovarianceInv.add(K_Mod_CovariancesInv.get(bestKi));
 
-            System.out.println("-----------------------------------------------");
+//            System.out.println("-----------------------------------------------");
         } // end: kazda klasa
     }
 

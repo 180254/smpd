@@ -141,14 +141,6 @@ public class Utils2 {
     }
 
     /**
-     * punkt "przegięcia" funkcji, miejsce gdzie sie normuje
-     * uzyteczne dla wykresu k od bledu.
-     */
-    public static int inflection_point(double[] points_y) {
-        return 5;
-    }
-
-    /**
      * Wskazuje te numery list, które są puste, w _odwrotnej kolejnosci_.
      * <pre>
      *  data = {
