@@ -4,6 +4,9 @@ import utils.Math2;
 import utils.Matrix2;
 import utils.Matrix3;
 
+import java.util.HashMap;
+import java.util.Map;
+
 public class Math2Test {
 
     @Test
@@ -56,6 +59,28 @@ public class Math2Test {
     public void max_test_false1() {
         double[] numbers = {};
         Math2.max(numbers);
+    }
+
+    @Test
+    public void max_map_test_true1() {
+        Map<String, Double> map = new HashMap<>();
+        map.put("a", 2.0);
+        map.put("b", 4.0);
+        map.put("c", 5.1);
+        map.put("d", -5.1);
+
+        String strExpected = "c";
+        double varExpected = 5.1;
+
+        Map.Entry<String, Double> result = Math2.max(map);
+        Assert.assertEquals(result.getKey(), strExpected);
+        Assert.assertEquals(result.getValue(), varExpected, 1e-10);
+    }
+
+    @Test(expected = RuntimeException.class)
+    public void max_map_test_false1() {
+        Map<String, Double> map = new HashMap<>();
+        Math2.max(map);
     }
 
     @Test
@@ -126,6 +151,15 @@ public class Math2Test {
     public void most_popular_test_true3() {
         int[] numbers = {3};
         int expected = 3;
+
+        int result = Math2.most_popular(numbers);
+        Assert.assertEquals(expected, result);
+    }
+
+    @Test
+    public void most_popular_test_true4() {
+        int[] numbers = {4, 3, 3, 4};
+        int expected = 4;
 
         int result = Math2.most_popular(numbers);
         Assert.assertEquals(expected, result);
@@ -743,13 +777,18 @@ public class Math2Test {
     }
 
 
-    @Test(expected = RuntimeException.class)
-    public void inflection_point_test_false1() {
+    @Test
+    public void inflection_point_test_true8() {
         double[] errors = {
                 0.134649619
         };
 
-        Math2.inflection_point(errors);
+        int expected_min = 1;
+        int expected_max = 1;
+        int expected = 1;
+
+        int result = Math2.inflection_point(errors);
+        Assert.assertEquals(result, expected);
     }
 
     @Test(expected = RuntimeException.class)

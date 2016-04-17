@@ -1,9 +1,6 @@
 package utils;
 
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.TreeSet;
+import java.util.*;
 import java.util.stream.DoubleStream;
 
 /**
@@ -70,8 +67,8 @@ public class Math2 {
 
     /**
      * Największa wartość w mapie.
-     * numbersMap = {{a,2}, {b,4}, {b,5}}
-     * wynik = {b,5}
+     * numbersMap = {{a,2}, {b,4}, {c,5}}
+     * wynik = {c,5}
      */
     public static <T> Map.Entry<T, Double> max(Map<T, Double> numbersMap) {
         return numbersMap.entrySet().stream()
@@ -109,7 +106,7 @@ public class Math2 {
         if (array.length == 0)
             throw new IllegalArgumentException();
 
-        Map<Integer, Integer> mapValueToCount = new HashMap<>();
+        Map<Integer, Integer> mapValueToCount = new LinkedHashMap<>();
         for (int i : array) {
             Integer count = mapValueToCount.get(i);
             mapValueToCount.put(i, count != null ? count + 1 : 0);
@@ -300,9 +297,10 @@ public class Math2 {
      * Punkt "przegięcia" funkcji, miejsce gdzie sie normuje. Uzyteczne dla wykresu k od bledu.
      * Za punkt ten uznaje takie K, dla ktorego osiagane jest 70% całkowitego spadku wartości bledu.
      * Wartości x są domyślne - od 1 do points_y.length-1
+     * Zwracana jest wartość x! _nie_ indeks.
      */
     public static int inflection_point(double[] points_y) {
-        if (points_y.length == 1) return 0;
+        if (points_y.length == 1) return 1;
 
         final double INFLECTION_PERCENT = 70;
         double total_diff = points_y[0] - points_y[points_y.length - 1];

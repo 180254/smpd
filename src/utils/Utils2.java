@@ -1,9 +1,6 @@
 package utils;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.Random;
+import java.util.*;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
@@ -37,6 +34,22 @@ public class Utils2 {
     }
 
     /**
+     * Sprawdza, czy wartości w tablicy są unikatowe.
+     * Z uwagi na użytą implementacje, dodatkowo jest wymóg, by wartości w niej były nieujemne.
+     */
+    public static boolean is_unique(int[] array) {
+        BitSet set = new BitSet();
+
+        for (int i : array) {
+            if (set.get(i))
+                return false;
+            set.set(i);
+        }
+
+        return true;
+    }
+
+    /**
      * Z danych, dataset =
      * cecha1 -> 0 | 1 | 2 | 1
      * cecha2 -> 0 | 1 | 2 | 2
@@ -52,6 +65,8 @@ public class Utils2 {
     public static double[][] extract_rows(double[][] dataset, int[] selected_rows) {
         if (selected_rows.length == 0)
             throw new IllegalArgumentException();
+        if (!is_unique(selected_rows))
+            throw new IllegalArgumentException();
 
         double[][] result = new double[selected_rows.length][];
 
@@ -61,7 +76,6 @@ public class Utils2 {
 
         return result;
     }
-
 
     /**
      * Indeksy z tablicy array, ktorych wartosc jest rowna value.
@@ -194,6 +208,12 @@ public class Utils2 {
         return DataSets_T;
     }
 
+    /**
+     * Dzieli zbior na klasy.
+     * Typowe użycie:
+     * datasets_t = extract_classes_t(x,y,z);
+     * datasets_n = extract_classes_n(datasets_t);
+     */
     public static double[][][] extract_classes_n(double[][][] DataSets_T) {
         double[][][] DataSets_N = new double[DataSets_T.length][][];
 

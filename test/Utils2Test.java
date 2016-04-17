@@ -58,6 +58,46 @@ public class Utils2Test {
     }
 
     @Test
+    public void is_unique_test_true1() {
+        int[] array = {1, 2, 3};
+
+        boolean result = Utils2.is_unique(array);
+        Assert.assertEquals(true, result);
+    }
+
+    @Test
+    public void is_unique_test_true2() {
+        int[] array = {9};
+
+        boolean result = Utils2.is_unique(array);
+        Assert.assertEquals(true, result);
+    }
+
+    @Test
+    public void is_unique_test_true3() {
+        int[] array = {};
+
+        boolean result = Utils2.is_unique(array);
+        Assert.assertEquals(true, result);
+    }
+
+    @Test
+    public void is_unique_test_false1() {
+        int[] array = {0, 2, 5, 0};
+
+        boolean result = Utils2.is_unique(array);
+        Assert.assertEquals(false, result);
+    }
+
+    @Test
+    public void is_unique_test_false2() {
+        int[] array = {999, 999};
+
+        boolean result = Utils2.is_unique(array);
+        Assert.assertEquals(false, result);
+    }
+
+    @Test
     public void extract_rows_test_true1() {
         double[][] dataset = {
                 {0, 1, 2, 1},
@@ -71,6 +111,17 @@ public class Utils2Test {
                 {0, 1, 2, 3},
                 {0, 1, 2, 4}
         };
+
+        double[][] result = Utils2.extract_rows(dataset, selected_rows);
+        Assert.assertTrue(Matrix3.equals(expected, result, 1e-10));
+    }
+
+    @Test
+    public void extract_rows_test_true2() {
+        double[][] dataset = {{-1}, {5.5}, {4}, {1}, {0}, {1}};
+        int[] selected_rows = {2, 3};
+
+        double[][] expected = {{4}, {1}};
 
         double[][] result = Utils2.extract_rows(dataset, selected_rows);
         Assert.assertTrue(Matrix3.equals(expected, result, 1e-10));
@@ -107,6 +158,22 @@ public class Utils2Test {
     public void extract_rows_test_false3() {
         double[][] dataset_n = {};
         int[] selected_rows = {0};
+
+        Utils2.extract_rows(dataset_n, selected_rows);
+    }
+
+    @Test(expected = RuntimeException.class)
+    public void extract_rows_test_false4() {
+        double[][] dataset_n = {{1}, {2}, {3}, {4}, {5}, {6}, {7}, {8}};
+        int[] selected_rows = {1, 2, 0, 0};
+
+        Utils2.extract_rows(dataset_n, selected_rows);
+    }
+
+    @Test(expected = RuntimeException.class)
+    public void extract_rows_test_false5() {
+        double[][] dataset_n = {{1}, {2}, {3}, {4}, {5}, {6}, {7}, {8}};
+        int[] selected_rows = {-1};
 
         Utils2.extract_rows(dataset_n, selected_rows);
     }
@@ -321,6 +388,69 @@ public class Utils2Test {
         int[] arr = {0, 2, 4100};
         int[] mapper = {10, 11, 12, 13, 14, 15};
 
-       Utils2.map_int_arr(arr, mapper);
+        Utils2.map_int_arr(arr, mapper);
     }
+
+    @Test
+    public void extract_classes_t_test_true1() {
+        double[][] DataSet_T = {
+                {1, 2, 3},
+                {5, 3, 2},
+                {-1, 0.1, 0},
+                {3, 1, 3},
+        };
+        int[] DataSetLabels_T = {0, 1, 2, 1};
+        String[] ClassNames = {"a", "b", "c"};
+
+        double[][][] expected = {
+                {
+                        {1, 2, 3}
+                },
+                {
+                        {5, 3, 2},
+                        {3, 1, 3}
+                },
+                {
+                        {-1, 0.1, 0}
+                }
+        };
+        double[][][] result = Utils2.extract_classes_t(DataSet_T, DataSetLabels_T, ClassNames);
+        Assert.assertEquals(expected.length, result.length);
+        Assert.assertTrue(Matrix3.equals(expected[0], result[0], 1e-10));
+        Assert.assertTrue(Matrix3.equals(expected[1], result[1], 1e-10));
+        Assert.assertTrue(Matrix3.equals(expected[2], result[2], 1e-10));
+    }
+
+    @Test(expected = RuntimeException.class)
+    public void extract_classes_t_test_false1() {
+        double[][] DataSet_T = {
+                {1, 2, 3},
+                {5, 3, 2}
+        };
+        int[] DataSetLabels_T = {0, 1};
+        String[] ClassNames = {"a", "b", "c"};
+
+        Utils2.extract_classes_t(DataSet_T, DataSetLabels_T, ClassNames);
+    }
+
+    @Test
+    public void extract_classes_n_test_true1() {
+        double[][][] DataSets_T = {
+                {{1, 2, 3}},
+                {{5, 3, 2}, {3, 1, 3}},
+                {{-1, 0.1, 0}}
+        };
+
+        double[][][] expected = {
+                {{1}, {2}, {3}},
+                {{5, 3}, {3, 1}, {2, 3}},
+                {{-1}, {0.1}, {0}}
+        };
+        double[][][] result = Utils2.extract_classes_n(DataSets_T);
+        Assert.assertEquals(expected.length, result.length);
+        Assert.assertTrue(Matrix3.equals(expected[0], result[0], 1e-10));
+        Assert.assertTrue(Matrix3.equals(expected[1], result[1], 1e-10));
+        Assert.assertTrue(Matrix3.equals(expected[2], result[2], 1e-10));
+    }
+
 }
