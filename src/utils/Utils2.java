@@ -1,6 +1,7 @@
 package utils;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Random;
 import java.util.stream.IntStream;
@@ -127,7 +128,7 @@ public class Utils2 {
      * List<Integer> = {1,2,5,6}
      * wynik = int[] { 1, 2, 5, 6}
      */
-    public static int[] to_int_array(List<Integer> integers) {
+    public static int[] to_int_array(Collection<Integer> integers) {
         return integers.stream().mapToInt(i -> i).toArray();
     }
 
@@ -136,7 +137,7 @@ public class Utils2 {
      * List<Double> = {1,2,5,6}
      * wynik = double[] { 1, 2, 5, 6}
      */
-    public static double[] to_dbl_array(List<Double> doubles) {
+    public static double[] to_dbl_array(Collection<Double> doubles) {
         return doubles.stream().mapToDouble(i -> i).toArray();
     }
 
@@ -176,5 +177,30 @@ public class Utils2 {
         return IntStream.of(arr)
                 .map(arr_value -> mapper[arr_value])
                 .toArray();
+    }
+
+    /**
+     * Dzieli zbior na klasy.
+     * wynik =  double[][][] -> [class_id][sample][feature]
+     */
+    public static double[][][] extract_classes_t(double[][] DataSet_T, int[] DataSetLabels_T, String[] ClassNames) {
+        double[][][] DataSets_T = new double[ClassNames.length][][];
+
+        for (int i = 0; i < ClassNames.length; i++) {
+            int[] indexes = Utils2.args_for_value(DataSetLabels_T, i);
+            DataSets_T[i] = Utils2.extract_rows(DataSet_T, indexes);
+        }
+
+        return DataSets_T;
+    }
+
+    public static double[][][] extract_classes_n(double[][][] DataSets_T) {
+        double[][][] DataSets_N = new double[DataSets_T.length][][];
+
+        for (int i = 0; i < DataSets_N.length; i++) {
+            DataSets_N[i] = Matrix2.transpose(DataSets_T[i]);
+        }
+
+        return DataSets_N;
     }
 }

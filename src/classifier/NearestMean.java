@@ -20,7 +20,7 @@ public class NearestMean extends Classifier {
 
     final int MAX_RETRY = 10;
     final int K_MIN = 1;
-    final int K_MAX = 25;
+    final int K_MAX = 15;
 
     public NearestMean(DistanceType distanceType, ClassType classType) {
         this.distanceType = distanceType;
@@ -30,14 +30,8 @@ public class NearestMean extends Classifier {
     @Override
     public void trainClassifier() {
         // extract training set for each class
-        TrainingSets_N = new double[ClassNames.length][][];
-        TrainingSets_T = new double[ClassNames.length][][];
-        for (int i = 0; i < ClassNames.length; i++) {
-            int[] indexes = Utils2.args_for_value(TrainingLabels_T, i);
-            TrainingSets_T[i] = Utils2.extract_rows(TrainingSet_T, indexes);
-            TrainingSets_N[i] = Matrix2.transpose(TrainingSets_T[i]);
-        }
-
+        TrainingSets_T = Utils2.extract_classes_t(TrainingSet_T, TrainingLabels_T, ClassNames);
+        TrainingSets_N = Utils2.extract_classes_n(TrainingSets_T);
         TrainingSetsMeans_N = new ArrayList<>();
         TrainingSetsCovarianceInv = new ArrayList<>();
 

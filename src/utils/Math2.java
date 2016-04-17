@@ -69,6 +69,18 @@ public class Math2 {
     }
 
     /**
+     * Największa wartość w mapie.
+     * numbersMap = {{a,2}, {b,4}, {b,5}}
+     * wynik = {b,5}
+     */
+    public static <T> Map.Entry<T, Double> max(Map<T, Double> numbersMap) {
+        return numbersMap.entrySet().stream()
+                .sorted((o1, o2) -> Double.compare(o2.getValue(), o1.getValue()))
+                .findFirst()
+                .orElseThrow(RuntimeException::new);
+    }
+
+    /**
      * Indeksy w tablicy liczb o k-najmniejszych wartosciach.
      * numbers = {3, 4, 88, 1, 2}
      * k = 3
@@ -251,23 +263,36 @@ public class Math2 {
     /**
      * Kowariancja danych dataset_n (D1xD2).
      * Średnie means_n (D1x1) przekazane w parametrze dla uniknięcia wielokrotnych obliczeń.
+     * 0: normalize with N-1, provides the best unbiased estimator of the covariance [default]
+     * 1: normalize with N, this provides the second moment around the mean
+     * 2: without normalization
      */
-    public static double[][] covariance(double[][] dataset_n) {
+    public static double[][] covariance(double[][] dataset_n, int normalize) {
+        double normalizeMultiplier;
+        if (normalize == 0) normalizeMultiplier = 1.0 / (dataset_n[0].length - 1);
+        else if (normalize == 1) normalizeMultiplier = 1.0 / (dataset_n[0].length);
+        else if (normalize == 2) normalizeMultiplier = 1.0;
+        else throw new IllegalArgumentException();
+
         double[][] datasetCAM_n = center_around_mean(dataset_n);
         double[][] datasetCAM_t = Matrix2.transpose(datasetCAM_n);
 
         double[][] multiply = Matrix2.multiply(datasetCAM_n, datasetCAM_t);
-        return Matrix2.multiply(multiply, 1.0 / (dataset_n[0].length - 1));
+        return Matrix2.multiply(multiply, normalizeMultiplier);
     }
 
+    public static double[][] covariance(double[][] dataset_n) {
+        return covariance(dataset_n, 0);
+    }
 
     /**
      * Punkt "przegięcia" funkcji, miejsce gdzie sie normuje. Uzyteczne dla wykresu k od bledu.
      * Za punkt ten uznaje takie K, dla ktorego osiagane jest 70% całkowitego spadku wartości bledu.
      * Wartości x są domyślne - od 1 do points_y.length-1
-     * Implementacja zaklada, ze sa conajmniej dwa punkty do wyboru (points_y.length >= 2).
      */
     public static int inflection_point(double[] points_y) {
+        if (points_y.length == 1) return 0;
+
         final double INFLECTION_PERCENT = 70;
         double total_diff = points_y[0] - points_y[points_y.length - 1];
 

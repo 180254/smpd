@@ -2,6 +2,7 @@ package pr;
 
 import Jama.Matrix;
 import classifier.*;
+import featsel.FisherDiscriminant;
 import utils.Utils2;
 
 import javax.swing.*;
@@ -10,6 +11,7 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.stream.IntStream;
 
@@ -405,14 +407,10 @@ public class PR_GUI extends javax.swing.JFrame {
         if (DataSet_N == null) return;
         if (f_rb_sel.isSelected()) {
             // the chosen strategy is feature selection
-            int[] flags = new int[FeatureCount];
-            selectFeatures(flags, Integer.parseInt((String) selbox_nfeat.getSelectedItem()));
-
-            // 208316
-            // W l_FLD_winner jest lista wybranych cech oddzielona przecinkami
-            // Obcinamy tabele z listami cech tylko do tych wybranych
-            int[] bestFeatures = Utils2.split_to_numbers(l_FLD_winner.getText());
-            DataSetNew_N = Utils2.extract_rows(DataSet_N, bestFeatures);
+            int newFeatureCount = Integer.parseInt((String) selbox_nfeat.getSelectedItem());
+            int[] flags = new int[newFeatureCount];
+            selectFeatures(flags, newFeatureCount);
+            DataSetNew_N = Utils2.extract_rows(DataSet_N, flags);
 
         } else if (f_rb_extr.isSelected()) {
             double TotEnergy = Double.parseDouble(tf_PCA_Energy.getText()) / 100.0;
@@ -641,17 +639,30 @@ public class PR_GUI extends javax.swing.JFrame {
     private void selectFeatures(int[] flags, int d) {
         // for now: check all individual features using 1D, 2-class Fisher criterion
 
-        if (d == 1) {
+        if (d == 0) { // 208316: wiecej nie uzywane, za kazdym razem wykorzystana wladna klasa
             double FLD = 0, tmp;
             int max_ind = -1;
             for (int i = 0; i < FeatureCount; i++) {
+                System.out.printf("%d -> %.5f%n", i, computeFisherLD(DataSet_N[i])); // 208316: debug
                 if ((tmp = computeFisherLD(DataSet_N[i])) > FLD) {
                     FLD = tmp;
                     max_ind = i;
                 }
             }
+            flags[0] = max_ind;
             l_FLD_winner.setText(max_ind + "");
             l_FLD_val.setText(FLD + "");
+            System.out.println("Fisher = " + max_ind);
+        } else {
+            // 208316: liczenie fishera
+            TimeStart = System.currentTimeMillis();
+            int[] features = new FisherDiscriminant().get_features(DataSet_N, ClassLabels, ClassNames, d);
+            System.out.println("Fisher = " + Arrays.toString(features));
+            System.arraycopy(features, 0, flags, 0, features.length);
+            TimeStop = System.currentTimeMillis();
+            System.out.println(String.format("Fisher time: %.3fs", (TimeStop - TimeStart) / 1000.0));
+
+
         }
         // to do: compute for higher dimensional spaces, use e.g. SFS for candidate selection
     }

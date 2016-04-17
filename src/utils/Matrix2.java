@@ -30,6 +30,13 @@ public class Matrix2 {
     }
 
     /**
+     * Wyznacznik macierzy.
+     */
+    public static double det(double[][] matrix) {
+        return new Jama.Matrix(matrix).det();
+    }
+
+    /**
      * Odwracanie macierzy.
      */
     public static double[][] inverse(double[][] matrix) {
