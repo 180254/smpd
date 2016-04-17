@@ -249,15 +249,22 @@ public class Math2 {
      * cecha3 -> -0.5 |  0.5 |-0.5 | 0.5
      * wynik =
      */
-    public static double[][] center_around_mean(double[][] dataset_n) {
+    public static double[][] center_around_mean(double[][] dataset_n, double[][] means_n) {
         double[][] dataset2_n = Matrix2.copy(dataset_n);
-        double[][] means_n = Math2.means_n(dataset2_n);
+        double[][] means2_n = means_n != null ? means_n : Math2.means_n(dataset2_n);
 
         for (int i = 0; i < dataset_n.length; i++)
             for (int j = 0; j < dataset_n[0].length; j++)
-                dataset2_n[i][j] -= means_n[i][0];
+                dataset2_n[i][j] -= means2_n[i][0];
 
         return dataset2_n;
+    }
+
+    /**
+     * Odmiana center_around_mean, gdzie macierz srednich nie jest znana i nalezy ja policzyc.
+     */
+    public static double[][] center_around_mean(double[][] dataset_n) {
+        return center_around_mean(dataset_n, null);
     }
 
     /**
@@ -267,22 +274,26 @@ public class Math2 {
      * 1: normalize with N, this provides the second moment around the mean
      * 2: without normalization
      */
-    public static double[][] covariance(double[][] dataset_n, int normalize) {
+    public static double[][] covariance(double[][] dataset_n, double[][] means_n, int normalize) {
         double normalizeMultiplier;
         if (normalize == 0) normalizeMultiplier = 1.0 / (dataset_n[0].length - 1);
         else if (normalize == 1) normalizeMultiplier = 1.0 / (dataset_n[0].length);
         else if (normalize == 2) normalizeMultiplier = 1.0;
         else throw new IllegalArgumentException();
 
-        double[][] datasetCAM_n = center_around_mean(dataset_n);
+        double[][] datasetCAM_n = means_n != null ? center_around_mean(dataset_n, means_n) : center_around_mean(dataset_n);
         double[][] datasetCAM_t = Matrix2.transpose(datasetCAM_n);
 
         double[][] multiply = Matrix2.multiply(datasetCAM_n, datasetCAM_t);
         return Matrix2.multiply(multiply, normalizeMultiplier);
     }
 
+    /**
+     * Odmiana covariance, gdzie macierz srednich nie jest znana i nalezy ja policzyc.
+     * Dodatkowo przyjmuje ona domyslna normalizacje = 0;
+     */
     public static double[][] covariance(double[][] dataset_n) {
-        return covariance(dataset_n, 0);
+        return covariance(dataset_n, null, 0);
     }
 
     /**
