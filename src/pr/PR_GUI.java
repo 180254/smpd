@@ -295,7 +295,17 @@ public class PR_GUI extends javax.swing.JFrame {
         jPanel4.add(jLabel9);
         jLabel9.setBounds(14, 44, 42, 16);
 
-        jComboBox2.setModel(new javax.swing.DefaultComboBoxModel(new String[]{"Nearest neighbor (NN)", "Nearest Mean (NM)", "k-Nearest Neighbor (k-NN)", "k-Nearest Mean (k-NM)"}));
+        jComboBox2.setModel(new javax.swing.DefaultComboBoxModel(
+                new String[]{
+                        "Neighbour-euc",
+                        "Neighbour-moh",
+                        "Mean-euc",
+                        "Mean-moh",
+                        "k-Neighbour-euc",
+                        "k-Neighbour-moh",
+                        "k-Mean-euc",
+                        "k-Mean-moh"
+                }));
         jPanel4.add(jComboBox2);
         jComboBox2.setBounds(74, 41, 178, 22);
 
@@ -430,22 +440,37 @@ public class PR_GUI extends javax.swing.JFrame {
         // 208316, odpowiedni nauczyciel w zaleznosci od tego co zostalo wybrane
         System.out.println("----------------------------------------------------");
         switch (jComboBox2.getSelectedIndex()) {
-            // "Nearest neighbor (NN)"
             case 0:
-                classifier = new NearestNeighbour();
-                System.out.println("Ustawiono NearestNeighbour");
+                classifier = new NearestNeighbour(DistanceType.Euclidean, ClassType.ONE);
+                System.out.println("Ustawiono NearestNeighbour Euclidean");
                 break;
             case 1:
-                System.out.println("Ustawiono NearestMean");
-                classifier = new NearestMean();
+                classifier = new NearestNeighbour(DistanceType.Mahalanobis, ClassType.ONE);
+                System.out.println("Ustawiono NearestNeighbour Mahalanobis");
                 break;
             case 2:
-                classifier = new KNearestNeighbour();
-                System.out.println("Ustawiono K-NearestNeighbour");
+                classifier = new NearestMean(DistanceType.Euclidean, ClassType.ONE);
+                System.out.println("Ustawiono NearestMean Euclidean");
                 break;
             case 3:
-                classifier = new KNearestMean();
-                System.out.println("Ustawiono K-NearestMean");
+                classifier = new NearestMean(DistanceType.Mahalanobis, ClassType.ONE);
+                System.out.println("Ustawiono NearestMean Mahalanobis");
+                break;
+            case 4:
+                classifier = new NearestNeighbour(DistanceType.Euclidean, ClassType.K);
+                System.out.println("Ustawiono K-NearestNeighbour");
+                break;
+            case 5:
+                classifier = new NearestNeighbour(DistanceType.Mahalanobis, ClassType.K);
+                System.out.println("Ustawiono K-NearestNeighbour");
+                break;
+            case 6:
+                classifier = new NearestMean(DistanceType.Euclidean, ClassType.K);
+                System.out.println("Ustawiono K-NearestMean Euclidean");
+                break;
+            case 7:
+                classifier = new NearestMean(DistanceType.Mahalanobis, ClassType.K);
+                System.out.println("Ustawiono K-NearestMean Mahalanobis");
                 break;
         }
 

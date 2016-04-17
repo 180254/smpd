@@ -90,8 +90,8 @@ public class Math2 {
 
     /**
      * Najczesciej wystepujaca wartosc w tablicy.
-     * array = {3, 5, 3, 3, 5}
-     * wynik = 3
+     * array = {7, 5, 7, 7, 5}
+     * wynik = 7
      */
     public static int most_popular(int[] array) {
         if (array.length == 0)

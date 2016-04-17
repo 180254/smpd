@@ -63,7 +63,7 @@ public abstract class Classifier {
                 TrainingSet_T.length,
                 TrainingSet_T.length / (double) Dataset_T.length * 100);
         System.out.println("TestSet_T.length = " + TestSet_T.length);
-        System.out.println("TrainingSet/TestSet_N.length = " + TrainingSet_N.length);
+        System.out.println("Features_V.length = " + TrainingSet_N.length);
     }
 
     public abstract void trainClassifier();

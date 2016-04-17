@@ -3,6 +3,7 @@ package utils;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
+import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
 /**
@@ -35,7 +36,7 @@ public class Utils2 {
     }
 
     /**
-     * Z danych, dataset_n =
+     * Z danych, dataset =
      * cecha1 -> 0 | 1 | 2 | 1
      * cecha2 -> 0 | 1 | 2 | 2
      * cecha3 -> 0 | 1 | 2 | 3
@@ -47,14 +48,14 @@ public class Utils2 {
      * cecha2 -> 0 | 1 | 2 | 3
      * cecha3 -> 0 | 1 | 2 | 4
      */
-    public static double[][] extract_rows(double[][] dataset_n, int[] selected_rows) {
+    public static double[][] extract_rows(double[][] dataset, int[] selected_rows) {
         if (selected_rows.length == 0)
             throw new IllegalArgumentException();
 
         double[][] result = new double[selected_rows.length][];
 
         for (int i = 0; i < selected_rows.length; i++) {
-            result[i] = dataset_n[selected_rows[i]];
+            result[i] = dataset[selected_rows[i]];
         }
 
         return result;
@@ -169,5 +170,19 @@ public class Utils2 {
         }
 
         return to_int_array(empty_ids);
+    }
+
+
+    /**
+     * Wartości z tablicy arr są mapowane na wartości tablicy mapper.
+     * Wartość arr staje się indeksem mapper.
+     * arr = {0,2,4}
+     * mapper = {10,11,12,13,14,15}
+     * wynik = {10,12,14}
+     */
+    public static int[] map_int_arr(int[] arr, int[] mapper) {
+        return IntStream.of(arr)
+                .map(arr_value -> mapper[arr_value])
+                .toArray();
     }
 }
