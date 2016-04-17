@@ -297,7 +297,7 @@ public class Math2 {
      * Punkt "przegięcia" funkcji, miejsce gdzie sie normuje. Uzyteczne dla wykresu k od bledu.
      * Za punkt ten uznaje takie K, dla ktorego osiagane jest 70% całkowitego spadku wartości bledu.
      * Wartości x są domyślne - od 1 do points_y.length-1
-     * Zwracana jest wartość x! _nie_ indeks.
+     * Zwracana jest wartość x (wartosc k)! _nie_ indeks.
      */
     public static int inflection_point(double[] points_y) {
         if (points_y.length == 1) return 1;

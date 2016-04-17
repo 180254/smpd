@@ -42,16 +42,16 @@ public class NearestMean extends Classifier {
             // w przypadku NN (bez k) zakladamy, ze klasa ma jeden mod
             // srednia i kowariancja jest liczona dla calej klasy
             if (classType == ClassType.ONE) {
-                for (int i = 0; i < ClassNames.length; i++) {
-                    double[][] means_n = Math2.means_n(TrainingSets_N[i]);
-                    TrainingSetsMeans_N.add(new ArrayList<>());
-                    TrainingSetsMeans_N.get(classId).add(means_n);
 
-                    double[][] covariance = Math2.covariance(TrainingSets_N[i]);
-                    double[][] covarianceInv = Matrix2.inverse(covariance);
-                    TrainingSetsCovarianceInv.add(new ArrayList<>());
-                    TrainingSetsCovarianceInv.get(classId).add(covarianceInv);
-                }
+                double[][] means_n = Math2.means_n(TrainingSets_N[classId]);
+                TrainingSetsMeans_N.add(new ArrayList<>());
+                TrainingSetsMeans_N.get(classId).add(means_n);
+
+                double[][] covariance = Math2.covariance(TrainingSets_N[classId]);
+                double[][] covarianceInv = Matrix2.inverse(covariance);
+                TrainingSetsCovarianceInv.add(new ArrayList<>());
+                TrainingSetsCovarianceInv.get(classId).add(covarianceInv);
+
                 continue; // each_class; pomijamy kolejne kroki kierowane do k-NN
             }
 
@@ -206,8 +206,7 @@ public class NearestMean extends Classifier {
                 if (properLabel == classLabel) ok++;
 
             } catch (RuntimeException ex) {
-                if (ex.getMessage().contains("singular")
-                        || ex.getMessage().contains("overflow")) {
+                if (ex.getMessage().contains("singular") || ex.getMessage().contains("overflow")) {
                     maxOk--;
                 } else {
                     throw ex;
@@ -220,7 +219,7 @@ public class NearestMean extends Classifier {
     }
 
     /**
-     * wynik = indeks z TrainingSets_N, wskazujacy do ktorej klasy (label) jest najblizej
+     * wynik = indeks wskazujacy do ktorej klasy (label) jest najblizej
      */
     private int nearestMean(double[] features_v) {
         int classLength = ClassNames.length;

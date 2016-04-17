@@ -20,15 +20,15 @@ public class NearestNeighbour extends Classifier {
     @Override
     public void trainClassifier() {
         if (distanceType == DistanceType.Mahalanobis) {
+            // macierze kowariancji dla kazdej klasy
+
             CovarianceInv = new double[ClassNames.length][][];
 
-            // macierze kowariancji dla kazdej klasy
-            for (int i = 0; i < ClassNames.length; i++) {
-                int[] class_indexes = Utils2.args_for_value(TrainingLabels_T, i);
-                double[][] ClassTrainSet_N =
-                        Matrix2.transpose(Utils2.extract_rows(TrainingSet_T, class_indexes));
+            double[][][] TrainingSets_T = Utils2.extract_classes_t(TrainingSet_T, TrainingLabels_T, ClassNames);
+            double[][][] TrainingSets_N = Utils2.extract_classes_n(TrainingSets_T);
 
-                CovarianceInv[i] = Matrix2.inverse(Math2.covariance(ClassTrainSet_N));
+            for (int i = 0; i < ClassNames.length; i++) {
+                CovarianceInv[i] = Matrix2.inverse(Math2.covariance(TrainingSets_N[i]));
             }
         }
 
@@ -44,18 +44,29 @@ public class NearestNeighbour extends Classifier {
     public double testClassifier() {
         if (kParam == null) return -1;
         int ok = 0;
+        int maxOk = TestSet_T.length;
 
         for (int i = 0; i < TestSet_T.length; i++) {
-            int[] trainingIndexes = nearestNeighbour(TestSet_T[i]);
-            int[] trainingLabels = Utils2.map_int_arr(trainingIndexes, TrainingLabels_T);
+            try {
+                int[] trainingIndexes = nearestNeighbour(TestSet_T[i]);
+                int[] trainingLabels = Utils2.map_int_arr(trainingIndexes, TrainingLabels_T);
 
-            int popularLabel = Math2.most_popular(trainingLabels);
-            int properLabel = TestLabels_T[i];
+                int popularLabel = Math2.most_popular(trainingLabels);
+                int properLabel = TestLabels_T[i];
 
-            if (properLabel == popularLabel) ok++;
+                if (properLabel == popularLabel) ok++;
+
+            } catch (RuntimeException ex) {
+                if (ex.getMessage().contains("singular") || ex.getMessage().contains("overflow")) {
+                    maxOk--;
+                } else {
+                    throw ex;
+                }
+            }
         }
 
-        return ok / (double) TestSet_T.length;
+        System.out.printf("Straconych próbek: %d/%d%n", TestSet_T.length - maxOk, TestSet_T.length);
+        return ok / (double) maxOk;
 
     }
 

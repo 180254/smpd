@@ -456,11 +456,11 @@ public class PR_GUI extends javax.swing.JFrame {
                 break;
             case 4:
                 classifier = new NearestNeighbour(DistanceType.Euclidean, ClassType.K);
-                System.out.println("Ustawiono K-NearestNeighbour");
+                System.out.println("Ustawiono K-NearestNeighbour Euclidean");
                 break;
             case 5:
                 classifier = new NearestNeighbour(DistanceType.Mahalanobis, ClassType.K);
-                System.out.println("Ustawiono K-NearestNeighbour");
+                System.out.println("Ustawiono K-NearestNeighbour Mahalanobis");
                 break;
             case 6:
                 classifier = new NearestMean(DistanceType.Euclidean, ClassType.K);
@@ -639,11 +639,11 @@ public class PR_GUI extends javax.swing.JFrame {
     private void selectFeatures(int[] flags, int d) {
         // for now: check all individual features using 1D, 2-class Fisher criterion
 
-        if (d == 0) { // 208316: wiecej nie uzywane, za kazdym razem wykorzystana wladna klasa
+        if (d == 1) { // 208316: wiecej nie uzywane, za kazdym razem wykorzystana wladna klasa
             double FLD = 0, tmp;
             int max_ind = -1;
             for (int i = 0; i < FeatureCount; i++) {
-                System.out.printf("%d -> %.5f%n", i, computeFisherLD(DataSet_N[i])); // 208316: debug
+//                System.out.printf("%d -> %.5f%n", i, computeFisherLD(DataSet_N[i])); // 208316: debug
                 if ((tmp = computeFisherLD(DataSet_N[i])) > FLD) {
                     FLD = tmp;
                     max_ind = i;
