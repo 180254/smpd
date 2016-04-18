@@ -300,11 +300,15 @@ public class PR_GUI extends javax.swing.JFrame {
         jComboBox2.setModel(new javax.swing.DefaultComboBoxModel(
                 new String[]{
                         "Neighbour-euc",
+                        "Neighbour-euc-kdim",
                         "Neighbour-moh",
+                        "Neighbour-moh-kdim",
                         "Mean-euc",
                         "Mean-moh",
                         "k-Neighbour-euc",
+                        "k-Neighbour-euc-kdim",
                         "k-Neighbour-moh",
+                        "k-Neighbour-moh-kdim",
                         "k-Mean-euc",
                         "k-Mean-moh"
                 }));
@@ -439,34 +443,50 @@ public class PR_GUI extends javax.swing.JFrame {
         System.out.println("----------------------------------------------------");
         switch (jComboBox2.getSelectedIndex()) {
             case 0:
-                classifier = new NearestNeighbour(DistanceType.Euclidean, ClassType.ONE);
+                classifier = new NearestNeighbour(DistanceType.Euclidean, ClassType.ONE, false);
                 System.out.println("Ustawiono NearestNeighbour Euclidean");
                 break;
             case 1:
-                classifier = new NearestNeighbour(DistanceType.Mahalanobis, ClassType.ONE);
-                System.out.println("Ustawiono NearestNeighbour Mahalanobis");
+                classifier = new NearestNeighbour(DistanceType.Euclidean, ClassType.ONE, true);
+                System.out.println("Ustawiono NearestNeighbour Euclidean K-Dim-Tree");
                 break;
             case 2:
+                classifier = new NearestNeighbour(DistanceType.Mahalanobis, ClassType.ONE, false);
+                System.out.println("Ustawiono NearestNeighbour Mahalanobis");
+                break;
+            case 3:
+                classifier = new NearestNeighbour(DistanceType.Mahalanobis, ClassType.ONE, true);
+                System.out.println("Ustawiono NearestNeighbour Mahalanobis K-Dim-Tree");
+                break;
+            case 4:
                 classifier = new NearestMean(DistanceType.Euclidean, ClassType.ONE);
                 System.out.println("Ustawiono NearestMean Euclidean");
                 break;
-            case 3:
+            case 5:
                 classifier = new NearestMean(DistanceType.Mahalanobis, ClassType.ONE);
                 System.out.println("Ustawiono NearestMean Mahalanobis");
                 break;
-            case 4:
-                classifier = new NearestNeighbour(DistanceType.Euclidean, ClassType.K);
+            case 6:
+                classifier = new NearestNeighbour(DistanceType.Euclidean, ClassType.K, false);
                 System.out.println("Ustawiono K-NearestNeighbour Euclidean");
                 break;
-            case 5:
-                classifier = new NearestNeighbour(DistanceType.Mahalanobis, ClassType.K);
+            case 7:
+                classifier = new NearestNeighbour(DistanceType.Euclidean, ClassType.K, true);
+                System.out.println("Ustawiono K-NearestNeighbour Euclidean K-Dim-Tree");
+                break;
+            case 8:
+                classifier = new NearestNeighbour(DistanceType.Mahalanobis, ClassType.K, false);
                 System.out.println("Ustawiono K-NearestNeighbour Mahalanobis");
                 break;
-            case 6:
+            case 9:
+                classifier = new NearestNeighbour(DistanceType.Mahalanobis, ClassType.K, true);
+                System.out.println("Ustawiono K-NearestNeighbour Mahalanobis K-Dim-Tree");
+                break;
+            case 10:
                 classifier = new NearestMean(DistanceType.Euclidean, ClassType.K);
                 System.out.println("Ustawiono K-NearestMean Euclidean");
                 break;
-            case 7:
+            case 11:
                 classifier = new NearestMean(DistanceType.Mahalanobis, ClassType.K);
                 System.out.println("Ustawiono K-NearestMean Mahalanobis");
                 break;
@@ -482,6 +502,7 @@ public class PR_GUI extends javax.swing.JFrame {
     }//GEN-LAST:event_b_TrainActionPerformed
 
     private void b_ExecuteActionPerformed(java.awt.event.ActionEvent evt) {
+        System.out.println("----------------------------------------------------");
         TimeStart = System.currentTimeMillis();
         double test = classifier.testClassifier();
         TimeStop = System.currentTimeMillis();

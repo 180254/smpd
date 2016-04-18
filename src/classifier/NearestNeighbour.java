@@ -4,7 +4,11 @@ import utils.Math2;
 import utils.Matrix2;
 import utils.Utils2;
 
+
 public class NearestNeighbour extends Classifier {
+
+    private boolean useKdt;
+    private KdtNode kdt; // drzewo k-dim-tree
 
     private DistanceType distanceType;
     private ClassType classType;
@@ -12,9 +16,10 @@ public class NearestNeighbour extends Classifier {
 
     private double[][][] CovarianceInv; // [class_id][mod_id][cov_inv,cov_inv]
 
-    public NearestNeighbour(DistanceType distanceType, ClassType classType) {
+    public NearestNeighbour(DistanceType distanceType, ClassType classType, boolean useKdt) {
         this.distanceType = distanceType;
         this.classType = classType;
+        this.useKdt = useKdt;
     }
 
     @Override
@@ -32,11 +37,18 @@ public class NearestNeighbour extends Classifier {
             }
         }
 
+        if (useKdt) {
+            int expectedLeafs = 10; // podzial nastapi na 10 sektorow
+            int kdtDepth = (int) Math2.log(expectedLeafs, 2); // jest to drzewo binarne, liczba lisci = 2^poziom
+            kdt = KdtNode.KdtTree(TrainingSet_T, kdtDepth);
+        }
+
         if (classType == ClassType.ONE) {
             kParam = 1;
         } else if (classType == ClassType.K) {
             kParam = 5;
         }
+
         System.out.printf("k = %d%n", kParam);
     }
 
@@ -46,9 +58,18 @@ public class NearestNeighbour extends Classifier {
         int ok = 0;
         int maxOk = TestSet_T.length;
 
+        int[] AllTrainingSetIndexes = Utils2.range_ex(0, TrainingSet_T.length);
+
         for (int i = 0; i < TestSet_T.length; i++) {
             try {
-                int[] trainingIndexes = nearestNeighbour(TestSet_T[i]);
+                // jezeli uzywamy kdt wskazujemy odpowiedni lisc z drzewam,
+                // w przeciwnym wypadku przeszukujemy caly TrainingSet_T
+                int[] neighbourIndexes = useKdt ? kdt.FindNeighbours(TestSet_T[i]) : AllTrainingSetIndexes;
+                if (i == 0) System.out.printf("Użyto próbek treningowych = %d (%.0f%%)%n",
+                        neighbourIndexes.length,
+                        neighbourIndexes.length / (double) AllTrainingSetIndexes.length * 100);
+
+                int[] trainingIndexes = nearestNeighbour(TestSet_T[i], neighbourIndexes);
                 int[] trainingLabels = Utils2.map_int_arr(trainingIndexes, TrainingLabels_T);
 
                 int popularLabel = Math2.most_popular(trainingLabels);
@@ -65,19 +86,19 @@ public class NearestNeighbour extends Classifier {
             }
         }
 
-        System.out.printf("Straconych próbek: %d/%d%n", TestSet_T.length - maxOk, TestSet_T.length);
+        System.out.printf("Straconych próbek testowych: %d/%d%n", TestSet_T.length - maxOk, TestSet_T.length);
         return ok / (double) maxOk;
-
     }
 
     /**
      * Najblizszy sasiad dla TrainingSet_T.
+     * Sasiedzi sa szukani tylko wsrod tych ze zbioru testowego, ktorzy byli wskazani w Training_Indexes.
      * wynik = indeksy z TrainingSet_T z k-najblizszych sasiadow
      */
-    private int[] nearestNeighbour(double[] features_v) {
+    private int[] nearestNeighbour(double[] features_v, int[] Training_Indexes) {
         double[] distances = new double[TrainingSet_T.length];
 
-        for (int i = 0; i < TrainingSet_T.length; i++) {
+        for (int i : Training_Indexes) {
 
             if (distanceType == DistanceType.Euclidean) {
                 distances[i] = Math2.distance_euclidean(features_v, TrainingSet_T[i]);

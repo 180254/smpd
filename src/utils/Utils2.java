@@ -78,6 +78,28 @@ public class Utils2 {
     }
 
     /**
+     * Wydziela do wektora jedną wybraną kolumnę.
+     * dataset =
+     * 0 | 1 | 2 | 3
+     * 2 | 5 | 6 | 7
+     * 1 | 8 | 9 | 7
+     * selected_column = 2
+     * result = { 1, 5, 8}
+     */
+    public static double[] extract_column(double[][] dataset, int selected_column) {
+        if (dataset.length == 0)
+            throw new IllegalArgumentException();
+
+        double[] result = new double[dataset.length];
+
+        for (int i = 0; i < dataset.length; i++) {
+            result[i] = dataset[i][selected_column];
+        }
+
+        return result;
+    }
+
+    /**
      * Indeksy z tablicy array, ktorych wartosc jest rowna value.
      * array = {0, 0, 0, 1, 0, 1, 1}
      * value = 0
@@ -222,5 +244,77 @@ public class Utils2 {
         }
 
         return DataSets_N;
+    }
+
+    /***
+     * Dodaje dodatkową kolumnę do oznaczania kolejności.
+     * Dodawane wartości są rosnące, od 0;
+     * dataset =
+     * 0 | 1 | 2 | 3
+     * 2 | 5 | 6 | 7
+     * 1 | 8 | 9 | 7
+     * wynik =
+     * 0 | 1 | 2 | 3 | 0
+     * 2 | 5 | 6 | 7 | 1
+     * 1 | 8 | 9 | 7 | 2
+     */
+    public static double[][] add_order_column(double[][] dataset) {
+        if (dataset.length == 0 || dataset[0].length == 0)
+            throw new IllegalArgumentException();
+
+        double[][] result = new double[dataset.length][];
+
+        for (int i = 0; i < dataset.length; i++) {
+            result[i] = new double[dataset[i].length + 1];
+            System.arraycopy(dataset[i], 0, result[i], 0, dataset[i].length);
+            result[i][result[i].length - 1] = i;
+        }
+
+        return result;
+    }
+
+    /**
+     * Tablica z wartościami od min (inclusive), do max (exclusive).
+     * min = 2
+     * max = 5
+     * wynik = {2,3,4,5}
+     */
+    public static int[] range_ex(int min, int max) {
+        if (min >= max) throw new IllegalArgumentException();
+        return IntStream.range(min, max).toArray();
+    }
+
+    /**
+     * Comparator dla tablic dwuwymiatowych, który sortuje po wybranej kolumnie.
+     * Typowe użycie:
+     * double[][] DataSet = ...
+     * Arrays.sort(DataSet, Utils2.array_comparator(0, true));
+     */
+    public static Comparator<double[]> array_comparator(int column, boolean asc) {
+        return (o1, o2) -> {
+            int cmp = Double.compare(o1[column], o2[column]);
+            return asc ? cmp : -cmp;
+        };
+    }
+
+    /**
+     * Konwertuje tablicę liczb całkowitych zapisanych w double[] na int[]
+     * doubles = {1.0,2.0,3.0}
+     * wynik= {1,2,3}
+     */
+    public static int[] dbl_to_int(double[] doubles) {
+        int[] result = new int[doubles.length];
+
+        for (int i = 0; i < doubles.length; i++) {
+            int intValue = (int) doubles[i];
+
+            if (!Matrix3.equals(intValue, doubles[i], 1e-10)) {
+                throw new IllegalArgumentException();
+            }
+
+            result[i] = intValue;
+        }
+
+        return result;
     }
 }

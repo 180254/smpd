@@ -4,7 +4,7 @@ import utils.Matrix2;
 
 public abstract class Classifier {
 
-    String[] ClassNames;
+    protected String[] ClassNames;
 
     protected double[][] TrainingSet_N, TestSet_N;
     protected double[][] TrainingSet_T, TestSet_T;

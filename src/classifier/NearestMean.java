@@ -214,7 +214,7 @@ public class NearestMean extends Classifier {
             }
         }
 
-        System.out.printf("Straconych próbek: %d/%d%n", TestSet_T.length - maxOk, TestSet_T.length);
+        System.out.printf("Straconych próbek testowych: %d/%d%n", TestSet_T.length - maxOk, TestSet_T.length);
         return ok / (double) maxOk;
     }
 

@@ -797,4 +797,39 @@ public class Math2Test {
         Math2.inflection_point(errors);
     }
 
+    @Test
+    public void log_test_true1() {
+        double result = Math2.log(127.5, 2);
+        double expected = 6.994353;
+        Assert.assertEquals(expected, result, 1e-5);
+    }
+
+    @Test
+    public void log_test_true2() {
+        double result = Math2.log(127.5, 7.1);
+        double expected = 2.473409;
+        Assert.assertEquals(expected, result, 1e-5);
+    }
+
+    @Test
+    public void log_test_true3() {
+        double result = Math2.log(2, 20);
+        double expected = 0.231378;
+        Assert.assertEquals(expected, result, 1e-5);
+    }
+
+    @Test(expected = RuntimeException.class)
+    public void log_test_false1() {
+        Math2.log(-127.5, 7.1);
+    }
+
+    @Test(expected = RuntimeException.class)
+    public void log_test_false2() {
+        Math2.log(127.5, -7.1);
+    }
+
+    @Test(expected = RuntimeException.class)
+    public void log_test_false3() {
+        Math2.log(127.5, -7.1);
+    }
 }

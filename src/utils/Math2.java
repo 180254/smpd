@@ -1,6 +1,9 @@
 package utils;
 
-import java.util.*;
+import java.util.Collections;
+import java.util.LinkedHashMap;
+import java.util.Map;
+import java.util.TreeSet;
 import java.util.stream.DoubleStream;
 
 /**
@@ -314,5 +317,13 @@ public class Math2 {
         }
 
         throw new RuntimeException();
+    }
+
+    /**
+     * Logarytm przy dowolnej podstawie.
+     */
+    public static double log(double x, double base) {
+        if (x < 0 || base < 0) throw new IllegalArgumentException();
+        return (Math.log(x) / Math.log(base));
     }
 }

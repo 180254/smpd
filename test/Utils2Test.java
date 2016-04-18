@@ -179,6 +179,61 @@ public class Utils2Test {
     }
 
     @Test
+    public void extract_column_test_true1() {
+        double[][] dataset_n = {
+                {0, 1, 2, 1},
+                {5, 8, -1, -2},
+                {1, 9, -5, -3},
+        };
+        int selected_column = 1;
+        double[] expected = {1, 8, 9};
+
+        double[] result = Utils2.extract_column(dataset_n, selected_column);
+        Assert.assertArrayEquals(expected, result, 1e-10);
+    }
+
+
+    @Test(expected = RuntimeException.class)
+    public void extract_column_test_false1() {
+        double[][] dataset_n = {
+                {0, 1, 2, 1},
+                {5, 8, -1, -2},
+                {1, 9, -5, -3},
+        };
+        int selected_column = 4;
+
+        Utils2.extract_column(dataset_n, selected_column);
+    }
+
+    @Test(expected = RuntimeException.class)
+    public void extract_column_test_false2() {
+        double[][] dataset_n = {
+                {0, 1, 2, 1},
+                {5, 8, -1, -2},
+                {1, 9, -5, -3},
+        };
+        int selected_column = -1;
+
+        Utils2.extract_column(dataset_n, selected_column);
+    }
+
+    @Test(expected = RuntimeException.class)
+    public void extract_column_test_false3() {
+        double[][] dataset_n = {};
+        int selected_column = 1;
+
+        Utils2.extract_column(dataset_n, selected_column);
+    }
+
+    @Test(expected = RuntimeException.class)
+    public void extract_column_test_false4() {
+        double[][] dataset_n = {{}};
+        int selected_column = 1;
+
+        Utils2.extract_column(dataset_n, selected_column);
+    }
+
+    @Test
     public void args_for_value_test_true1() {
         int[] array = {0, 0, 0, 1, 0, 1, 1};
         int value = 0;
@@ -453,4 +508,121 @@ public class Utils2Test {
         Assert.assertTrue(Matrix3.equals(expected[2], result[2], 1e-10));
     }
 
+    @Test
+    public void add_order_column_test_true1() {
+        double[][] dataset_n = {
+                {0, 1, 2, 1},
+                {5, 8, -1, -2},
+                {1, 9, -5, -3},
+        };
+        double[][] expected = {
+                {0, 1, 2, 1, 0},
+                {5, 8, -1, -2, 1},
+                {1, 9, -5, -3, 2},
+        };
+
+        double[][] result = Utils2.add_order_column(dataset_n);
+        Assert.assertTrue(Matrix3.equals(expected, result, 1e-10));
+    }
+
+    @Test
+    public void add_order_column_test_true2() {
+        double[][] dataset_n = {
+                {0, 1, 2, 1},
+        };
+        double[][] expected = {
+                {0, 1, 2, 1, 0},
+        };
+
+        double[][] result = Utils2.add_order_column(dataset_n);
+        Assert.assertTrue(Matrix3.equals(expected, result, 1e-10));
+    }
+
+    @Test
+    public void add_order_column_test_true3() {
+        double[][] dataset_n = {
+                {-5}, {-1}, {3}
+        };
+        double[][] expected = {
+                {-5, 0}, {-1, 1}, {3, 2}
+        };
+
+        double[][] result = Utils2.add_order_column(dataset_n);
+        Assert.assertTrue(Matrix3.equals(expected, result, 1e-10));
+    }
+
+    @Test
+    public void add_order_column_test_true4() {
+        double[][] dataset_n = {{-5}};
+        double[][] expected = {{-5, 0}};
+
+        double[][] result = Utils2.add_order_column(dataset_n);
+        Assert.assertTrue(Matrix3.equals(expected, result, 1e-10));
+    }
+
+    @Test(expected = RuntimeException.class)
+    public void add_order_column_test_false1() {
+        double[][] dataset_n = {};
+        Utils2.add_order_column(dataset_n);
+    }
+
+    @Test(expected = RuntimeException.class)
+    public void add_order_column_test_false2() {
+        double[][] dataset_n = {{}};
+        Utils2.add_order_column(dataset_n);
+    }
+
+    @Test
+    public void range_ex_test_true1() {
+        int min = 2;
+        int max = 5;
+        int expected[] = {2, 3, 4};
+
+        int[] result = Utils2.range_ex(min, max);
+        Assert.assertArrayEquals(expected, result);
+    }
+
+    @Test
+    public void range_ex_test_true2() {
+        int min = -2;
+        int max = 2;
+        int expected[] = {-2, -1, 0, 1};
+
+        int[] result = Utils2.range_ex(min, max);
+        Assert.assertArrayEquals(expected, result);
+    }
+
+
+    @Test(expected = RuntimeException.class)
+    public void range_inclusive_test_false1() {
+        int min = 2;
+        int max = 1;
+
+        Utils2.range_ex(min, max);
+    }
+
+    @Test(expected = RuntimeException.class)
+    public void range_inclusive_test_false2() {
+        int min = 0;
+        int max = 0;
+
+        Utils2.range_ex(min, max);
+    }
+
+    @Test
+    public void dbl_to_int_test_true1() {
+        double[] doubles = {2.0, 6.0, -5.0};
+        int[] expected = {2, 6, -5};
+
+        int[] result = Utils2.dbl_to_int(doubles);
+        Assert.assertArrayEquals(expected, result);
+    }
+
+    @Test(expected = RuntimeException.class)
+    public void dbl_to_int_test_false1() {
+        double[] doubles = {2.002, 6.0, -5.0};
+        Utils2.dbl_to_int(doubles);
+    }
+
 }
+
