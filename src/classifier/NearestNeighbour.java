@@ -4,7 +4,6 @@ import utils.Math2;
 import utils.Matrix2;
 import utils.Utils2;
 
-
 public class NearestNeighbour extends Classifier {
 
     private boolean useKdt;
@@ -97,23 +96,26 @@ public class NearestNeighbour extends Classifier {
      * wynik = indeksy z TrainingSet_T z k-najblizszych sasiadow
      */
     private int[] nearestNeighbour(double[] features_v, int[] Training_Indexes) {
-        double[] distances = new double[TrainingSet_T.length];
+        double[] distances = new double[Training_Indexes.length];
 
-        for (int i : Training_Indexes) {
+        for (int i = 0; i < Training_Indexes.length; i++) {
+            int trainIndex = Training_Indexes[i];
 
             if (distanceType == DistanceType.Euclidean) {
-                distances[i] = Math2.distance_euclidean(features_v, TrainingSet_T[i]);
+                distances[i] = Math2.distance_euclidean(features_v, TrainingSet_T[trainIndex]);
 
             } else if (distanceType == DistanceType.Mahalanobis) {
-                int classId = TrainingLabels_T[i];
+                int classId = TrainingLabels_T[trainIndex];
                 distances[i] = Math2.distance_mahalanobis(
                         Matrix2.to_matrix_n(features_v),
-                        Matrix2.to_matrix_n(TrainingSet_T[i]),
+                        Matrix2.to_matrix_n(TrainingSet_T[trainIndex]),
                         CovarianceInv[classId]);
             }
+
         }
 
-        return Math2.arg_min(distances, kParam);
+        int[] min_dist = Math2.arg_min(distances, kParam);
+        return Utils2.map_int_arr(min_dist, Training_Indexes);
     }
 
 }
