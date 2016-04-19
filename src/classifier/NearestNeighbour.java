@@ -78,7 +78,8 @@ public class NearestNeighbour extends Classifier {
                 if (properLabel == popularLabel) ok++;
 
             } catch (RuntimeException ex) {
-                if (ex.getMessage().contains("singular") || ex.getMessage().contains("overflow")) {
+                if (ex.getMessage() != null &&
+                        (ex.getMessage().contains("singular") || ex.getMessage().contains("overflow"))) {
                     maxOk--;
                 } else {
                     throw ex;

@@ -502,6 +502,7 @@ public class PR_GUI extends javax.swing.JFrame {
     }//GEN-LAST:event_b_TrainActionPerformed
 
     private void b_ExecuteActionPerformed(java.awt.event.ActionEvent evt) {
+        if(classifier == null) return;
         System.out.println("----------------------------------------------------");
         TimeStart = System.currentTimeMillis();
         double test = classifier.testClassifier();
