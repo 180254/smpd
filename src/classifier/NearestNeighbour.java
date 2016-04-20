@@ -38,7 +38,7 @@ public class NearestNeighbour extends Classifier {
 
         if (useKdt) {
             kdt = KdtNode.KdtTree(TrainingSet_T);
-            System.out.printf("KDTree: głębokość: %d; indeksów/liść: %d%n",
+            System.out.printf("KDTree: głębokość = %d; indeksów/liść = %d%n",
                     kdt.Depth() + 1, KdtNode.LEAF_IND_LENGTH);
         }
 

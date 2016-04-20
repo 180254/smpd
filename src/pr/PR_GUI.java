@@ -2,7 +2,7 @@ package pr;
 
 import Jama.Matrix;
 import classifier.*;
-import featsel.FisherDiscriminant;
+import featurespace.FisherDiscriminant;
 import utils.Utils2;
 
 import javax.swing.*;

@@ -1,4 +1,4 @@
-package featsel;
+package featurespace;
 
 import org.apache.commons.math3.util.Combinations;
 import utils.Math2;
