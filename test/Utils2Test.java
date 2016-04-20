@@ -592,7 +592,6 @@ public class Utils2Test {
         Assert.assertArrayEquals(expected, result);
     }
 
-
     @Test(expected = RuntimeException.class)
     public void range_inclusive_test_false1() {
         int min = 2;
@@ -607,6 +606,79 @@ public class Utils2Test {
         int max = 0;
 
         Utils2.range_ex(min, max);
+    }
+
+    @Test
+    public void array_by_col_comparator_test_true1() {
+        double[][] dataset = {
+                {0, 1, 2, 1},
+                {5, 8, -1, -2},
+                {1, 9, -5, -3},
+        };
+        double[][] expected = {
+                {1, 9, -5, -3},
+                {5, 8, -1, -2},
+                {0, 1, 2, 1},
+        };
+
+        Arrays.sort(dataset, Utils2.array_by_col_comparator(3, true));
+        Assert.assertTrue(Matrix3.equals(expected, dataset, 1e-10));
+    }
+
+    @Test
+    public void array_by_col_comparator_test_true2() {
+        double[][] dataset = {
+                {0, 1, 2, 1},
+                {5, 8, -1, -2},
+                {1, 9, -5, -3},
+        };
+        double[][] expected = {
+                {5, 8, -1, -2},
+                {1, 9, -5, -3},
+                {0, 1, 2, 1},
+        };
+
+        Arrays.sort(dataset, Utils2.array_by_col_comparator(0, false));
+        Assert.assertTrue(Matrix3.equals(expected, dataset, 1e-10));
+    }
+
+    @Test
+    public void array_by_col_comparator_test_true3() {
+        double[][] dataset = {
+                {0, 1, 2, 1},
+                {1, 9, -5, -3},
+                {0, 1, 2, 2},
+        };
+        double[][] expected = {
+                {0, 1, 2, 1},
+                {0, 1, 2, 2},
+                {1, 9, -5, -3},
+        };
+
+        Arrays.sort(dataset, Utils2.array_by_col_comparator(0, true));
+        Assert.assertTrue(Matrix3.equals(expected, dataset, 1e-10));
+    }
+
+    @Test(expected = RuntimeException.class)
+    public void array_by_col_comparator_test_false1() {
+        double[][] dataset = {
+                {0, 1, 2, 1},
+                {5, 8, -1, -2},
+                {1, 9, -5, -3},
+        };
+
+        Arrays.sort(dataset, Utils2.array_by_col_comparator(-1, false));
+    }
+
+    @Test(expected = RuntimeException.class)
+    public void array_by_col_comparator_test_false2() {
+        double[][] dataset = {
+                {0, 1, 2, 1},
+                {5, 8, -1, -2},
+                {1, 9, -5, -3},
+        };
+
+        Arrays.sort(dataset, Utils2.array_by_col_comparator(4, false));
     }
 
     @Test

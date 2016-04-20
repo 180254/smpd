@@ -37,9 +37,9 @@ public class NearestNeighbour extends Classifier {
         }
 
         if (useKdt) {
-            int expectedLeafs = 10; // podzial nastapi na 10 sektorow
-            int kdtDepth = (int) Math2.log(expectedLeafs, 2); // jest to drzewo binarne, liczba lisci = 2^poziom
-            kdt = KdtNode.KdtTree(TrainingSet_T, kdtDepth);
+            kdt = KdtNode.KdtTree(TrainingSet_T);
+            System.out.printf("KDTree: głębokość: %d; indeksów/liść: %d%n",
+                    kdt.Depth() + 1, KdtNode.LEAF_IND_LENGTH);
         }
 
         if (classType == ClassType.ONE) {
@@ -63,7 +63,7 @@ public class NearestNeighbour extends Classifier {
             try {
                 // jezeli uzywamy kdt wskazujemy odpowiedni lisc z drzewam,
                 // w przeciwnym wypadku przeszukujemy caly TrainingSet_T
-                int[] neighbourIndexes = useKdt ? kdt.FindNeighbours(TestSet_T[i]) : AllTrainingSetIndexes;
+                int[] neighbourIndexes = useKdt ? kdt.FindNeighbours(TestSet_T[i], kParam) : AllTrainingSetIndexes;
                 if (i == 0) System.out.printf("Użyto próbek treningowych = %d (%.0f%%)%n",
                         neighbourIndexes.length,
                         neighbourIndexes.length / (double) AllTrainingSetIndexes.length * 100);

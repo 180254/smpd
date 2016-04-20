@@ -288,9 +288,9 @@ public class Utils2 {
      * Comparator dla tablic dwuwymiatowych, który sortuje po wybranej kolumnie.
      * Typowe użycie:
      * double[][] DataSet = ...
-     * Arrays.sort(DataSet, Utils2.array_comparator(0, true));
+     * Arrays.sort(DataSet, Utils2.array_by_col_comparator(0, true));
      */
-    public static Comparator<double[]> array_comparator(int column, boolean asc) {
+    public static Comparator<double[]> array_by_col_comparator(int column, boolean asc) {
         return (o1, o2) -> {
             int cmp = Double.compare(o1[column], o2[column]);
             return asc ? cmp : -cmp;
