@@ -168,6 +168,10 @@ public class NearestMean extends Classifier {
                 }
             } // end: kazde k
 
+            if (K_Mean_Errors.size() == 0) {
+                throw new RuntimeException("Unable to train due to singulars or overflows");
+            }
+
             // policzenie najlepszego k
             int bestK = Math2.inflection_point(Utils2.to_dbl_array(K_Mean_Errors));
             int bestKi = bestK - K_MIN;

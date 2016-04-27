@@ -20,9 +20,10 @@ public class FisherDiscriminant {
      * @param DataSetLabels_T Etykiety, do ktorej klasy naleza kolejne probki.
      * @param ClassNames      Nazwy kolejnych klas. Indeksem tablicy sa etykiety z DataSetLabels_T.
      * @param select_k        Ile cech nalezy wybrac.
+     * @param skipFeatures    Cechy uznane za niespełniające warunków. Zostana pominiete podczas diskriminacji.
      * @return Tablica cech, ktore sa najlepsze do liniowej dyskryminacji.
      */
-    public int[] get_features(double[][] DataSet_N, int[] DataSetLabels_T, String[] ClassNames, int select_k) {
+    public static int[] get_features(double[][] DataSet_N, int[] DataSetLabels_T, String[] ClassNames, int select_k, int[] skipFeatures) {
         if (ClassNames.length != 2) {
             throw new RuntimeException();
         }
@@ -47,10 +48,12 @@ public class FisherDiscriminant {
         // zebranie wszystkich obliczen do wykonania
         List<Callable<Object>> fisherTasks = new ArrayList<>();
         for (int[] features : featuersIt) {
-            fisherTasks.add(Executors.callable(() -> {
-                double fisher = fisher2(DataSets_N[0], DataSets_N[1], DataSetMeans_N[0], DataSetMeans_N[1], features);
-                fishers.put(features, fisher);
-            }));
+            if (!Utils2.contains_any(features, skipFeatures)) {
+                fisherTasks.add(Executors.callable(() -> {
+                    double fisher = fisher2(DataSets_N[0], DataSets_N[1], DataSetMeans_N[0], DataSetMeans_N[1], features);
+                    fishers.put(features, fisher);
+                }));
+            }
         }
 
         // wykonanie obliczen

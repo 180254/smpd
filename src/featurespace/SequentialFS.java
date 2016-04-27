@@ -17,9 +17,10 @@ public class SequentialFS {
      * @param DataSetLabels_T Etykiety, do ktorej klasy naleza kolejne probki.
      * @param ClassNames      Nazwy kolejnych klas. Indeksem tablicy sa etykiety z DataSetLabels_T.
      * @param select_k        Ile cech nalezy wybrac.
+     * @param skipFeatures    Cechy uznane za niespełniające warunków. Zostana pominiete podczas diskriminacji.
      * @return Tablica cech, ktore sa najlepsze do liniowej dyskryminacji.
      */
-    public int[] get_features(double[][] DataSet_N, int[] DataSetLabels_T, String[] ClassNames, int select_k) {
+    public static int[] get_features(double[][] DataSet_N, int[] DataSetLabels_T, String[] ClassNames, int select_k, int[] skipFeatures) {
         if (ClassNames.length != 2) {
             throw new RuntimeException();
         }
@@ -47,8 +48,9 @@ public class SequentialFS {
             double[] ki_fishers = new double[featuresLen];
             for (int fi = 0; fi < featuresLen; fi++) {
 
-                // pomijane obliczenia dla "samego siebie" i dla cech juz wybranych
-                if (fi == ki || s_features.contains(fi)) {
+                // pomijane obliczenia dla "samego siebie", cech juz wybranych i cech pomijanych
+                if (fi == ki || s_features.contains(fi)
+                        || Utils2.contains(skipFeatures, fi)) {
                     ki_fishers[fi] = Double.MIN_VALUE;
                     continue;
                 }

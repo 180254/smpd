@@ -4,6 +4,7 @@ import Jama.Matrix;
 import classifier.*;
 import featurespace.FisherDiscriminant;
 import featurespace.SequentialFS;
+import utils.Matrix2;
 import utils.Utils2;
 
 import javax.swing.*;
@@ -411,13 +412,19 @@ public class PR_GUI extends javax.swing.JFrame {
     private void b_deriveFSActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_b_deriveFSActionPerformed
         // derive optimal feature space
         if (DataSet_N == null) return;
+        System.out.println("----------------------------------------------------");
 
         if (f_rb_sel.isSelected()) { // selection
+            // 208316: obliczanie cech nieuzytecznych podczas selekcji
+            double[][] DataSet_T = Matrix2.transpose(DataSet_N);
+            int[] skipFeatures = Utils2.bad_features(DataSet_T, ClassLabels, ClassNames);
+            System.out.println("Skipped.Features = " + Arrays.toString(skipFeatures));
+
             if (f_combo_criterion.getSelectedIndex() == 0) { // fisher
                 // the chosen strategy is feature selection
                 int newFeatureCount = Integer.parseInt((String) selbox_nfeat.getSelectedItem());
                 int[] flags = new int[newFeatureCount];
-                selectFeatures(flags, newFeatureCount);
+                selectFeatures(flags, newFeatureCount, skipFeatures);
                 DataSetNew_N = Utils2.extract_rows(DataSet_N, flags);
 
             } else if (f_combo_criterion.getSelectedIndex() == 1) { // sfs
@@ -425,7 +432,7 @@ public class PR_GUI extends javax.swing.JFrame {
                 TimeStart = System.currentTimeMillis();
 
                 int newFeatureCount = Integer.parseInt((String) selbox_nfeat.getSelectedItem());
-                int[] features = new SequentialFS().get_features(DataSet_N, ClassLabels, ClassNames, newFeatureCount);
+                int[] features = SequentialFS.get_features(DataSet_N, ClassLabels, ClassNames, newFeatureCount, skipFeatures);
                 System.out.println("SFS = " + Arrays.toString(features));
 
                 TimeStop = System.currentTimeMillis();
@@ -447,6 +454,7 @@ public class PR_GUI extends javax.swing.JFrame {
             DataSetNew_N = projectSamples(new Matrix(FFNorm), TransformMat);
             // DataSetNew_N is a matrix with samples projected to a new feature space
             l_NewDim.setText(DataSetNew_N.length + "");
+            System.out.println("Extraction.Features = " + DataSetNew_N.length);
         }
     }//GEN-LAST:event_b_deriveFSActionPerformed
 
@@ -676,7 +684,7 @@ public class PR_GUI extends javax.swing.JFrame {
         int cc = 1;
     }
 
-    private void selectFeatures(int[] flags, int d) {
+    private void selectFeatures(int[] flags, int d, int[] skipFeatures) {
         // for now: check all individual features using 1D, 2-class Fisher criterion
 
         if (d == 1) { // 208316: wiecej nie uzywane, za kazdym razem wykorzystana wladna klasa
@@ -696,7 +704,7 @@ public class PR_GUI extends javax.swing.JFrame {
         } else {
             // 208316: liczenie fishera
             TimeStart = System.currentTimeMillis();
-            int[] features = new FisherDiscriminant().get_features(DataSet_N, ClassLabels, ClassNames, d);
+            int[] features = FisherDiscriminant.get_features(DataSet_N, ClassLabels, ClassNames, d, skipFeatures);
             System.out.println("Fisher = " + Arrays.toString(features));
             System.arraycopy(features, 0, flags, 0, features.length);
             TimeStop = System.currentTimeMillis();

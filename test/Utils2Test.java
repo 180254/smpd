@@ -696,5 +696,142 @@ public class Utils2Test {
         Utils2.dbl_to_int(doubles);
     }
 
+    @Test
+    public void contains_test_true1() {
+        int[] array = {2, 0, 4, 88, 5, 1};
+        int value = 2;
+
+        boolean result = Utils2.contains(array, value);
+        Assert.assertEquals(true, result);
+    }
+
+    @Test
+    public void contains_test_true2() {
+        int[] array = {2, 0, 4, 88, 5, 1};
+        int value = 88;
+
+        boolean result = Utils2.contains(array, value);
+        Assert.assertEquals(true, result);
+    }
+
+    @Test
+    public void contains_test_true3() {
+        int[] array = {2, 0, 4, 88, 5, 1};
+        int value = 1;
+
+        boolean result = Utils2.contains(array, value);
+        Assert.assertEquals(true, result);
+    }
+
+    @Test
+    public void contains_test_false1() {
+        int[] array = {2, 0, 4, 88, 5, 1};
+        int value = -88;
+
+        boolean result = Utils2.contains(array, value);
+        Assert.assertEquals(false, result);
+    }
+
+    @Test
+    public void contains_test_false2() {
+        int[] array = {};
+        int value = 89;
+
+        boolean result = Utils2.contains(array, value);
+        Assert.assertEquals(false, result);
+    }
+
+    @Test
+    public void contains_any_test_true1() {
+        int[] array = {2, 0, 4, 88, 5, 1};
+        int[] values = {-88, 2};
+
+        boolean result = Utils2.contains_any(array, values);
+        Assert.assertEquals(true, result);
+    }
+
+    @Test
+    public void contains_any_test_true2() {
+        int[] array = {2, 0, 4, 5, 1};
+        int[] values = {-88, 1, 66};
+
+        boolean result = Utils2.contains_any(array, values);
+        Assert.assertEquals(true, result);
+    }
+
+    @Test
+    public void contains_any_test_true3() {
+        int[] array = {2, 0, 4, 5, 1};
+        int[] values = {-88, -1, 1};
+
+        boolean result = Utils2.contains_any(array, values);
+        Assert.assertEquals(true, result);
+    }
+
+    @Test
+    public void contains_any_test_false1() {
+        int[] array = {2, 0, 4, 5, 1};
+        int[] values = {-88, -1, 8};
+
+        boolean result = Utils2.contains_any(array, values);
+        Assert.assertEquals(false, result);
+    }
+
+    @Test
+    public void contains_any_test_false2() {
+        int[] array = {2, 0, 4, 5, 1};
+        int[] values = {};
+
+        boolean result = Utils2.contains_any(array, values);
+        Assert.assertEquals(false, result);
+    }
+
+    @Test
+    public void bad_features_test_true1() {
+        double[][] DataSet_T = {
+                {5, 1, 1, 3},
+                {5, 6, 1, 8},
+                {5, 2, 1, 8},
+                {9, 9, 9, 9}
+        };
+        int[] DataSetLabels_T = {0, 0, 0, 1};
+        String[] ClassNames = {"a", "b"};
+        int[] expected = {0, 2};
+
+        int[] result = Utils2.bad_features(DataSet_T, DataSetLabels_T, ClassNames);
+        Assert.assertArrayEquals(expected, result);
+    }
+
+    @Test
+    public void bad_features_test_false1() {
+        double[][] DataSet_T = {
+                {5, 1, 1, 3},
+                {5, 6, 1, 8},
+                {5, 2, 1, 8},
+                {9, 9, 9, 9}
+        };
+        int[] DataSetLabels_T = {1, 0, 0, 0};
+        String[] ClassNames = {"a", "b"};
+        int[] expected = {};
+
+        int[] result = Utils2.bad_features(DataSet_T, DataSetLabels_T, ClassNames);
+        Assert.assertArrayEquals(expected, result);
+    }
+
+    @Test
+    public void bad_features_test_false2() {
+        double[][] DataSet_T = {
+                {5, 1, 1, 3},
+                {5, 0, 1, 8},
+                {5, 0, 0, 7},
+                {5.0001, 7, -1, 9}
+        };
+        int[] DataSetLabels_T = {1, 0, 0, 0};
+        String[] ClassNames = {"a", "b"};
+        int[] expected = {};
+
+        int[] result = Utils2.bad_features(DataSet_T, DataSetLabels_T, ClassNames);
+        Assert.assertArrayEquals(expected, result);
+    }
 }
 

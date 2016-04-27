@@ -317,4 +317,56 @@ public class Utils2 {
 
         return result;
     }
+
+
+    /**
+     * Sprawdza, czy tablica zawiera wskazaną wartość.
+     * array = {2,3,5,1,99,0,6}
+     * value = 3
+     * wynik = true
+     */
+    public static boolean contains(int[] array, int value) {
+        return IntStream.of(array).anyMatch(x -> x == value);
+    }
+
+    /**
+     * Sprawdza, czy tablica (array) zawiera jakąkolwiek wartość z tablicy poszukiwanych (values)
+     * array = {2,3,5,1,99,0,6}
+     * values = {3,890}
+     * wynik = true
+     */
+    public static boolean contains_any(int[] array, int[] values) {
+        for (int array_value : array) {
+            for (int find_value : values) {
+                if (array_value == find_value) {
+                    return true;
+                }
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * Znajduje cechy, których wariancja w ramach klasy jest zerowa.
+     * Taka cecha nie może być użyta w czasie selekcji,
+     * gdyż macierz kowariancji obliczona z jej użyciem ma wyznacznik zerowy.
+     */
+    public static int[] bad_features(double[][] DataSet_T, int[] DataSetLabels_T, String[] ClassNames) {
+        double[][][] DataSets_T = extract_classes_t(DataSet_T, DataSetLabels_T, ClassNames);
+        double[][][] DataSets_N = extract_classes_n(DataSets_T);
+
+        List<Integer> badFeatures = new ArrayList<>();
+        for (double[][] dataset_ni : DataSets_N) { // data index
+            for (int fi = 0; fi < dataset_ni.length; fi++) { // feature index
+                if (Matrix3.equals(Math2.variance(DataSets_N[0][fi]), 0, 1e-20)// wariancja jest 0
+                        && !badFeatures.contains(fi)) {  // cecha jeszcze nie zanotowana
+
+                    badFeatures.add(fi);
+                }
+            }
+        }
+
+        return Utils2.to_int_array(badFeatures);
+    }
 }
