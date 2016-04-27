@@ -12,6 +12,16 @@ import java.util.concurrent.*;
 
 public class FisherDiscriminant {
 
+    /**
+     * Wybiera najlepsze cechy na podstawie wspolczynnikow fishera.
+     * Sprawdzane sa wszystkie kombinacje k-cech.
+     *
+     * @param DataSet_N       Zbior danych treningowych.
+     * @param DataSetLabels_T Etykiety, do ktorej klasy naleza kolejne probki.
+     * @param ClassNames      Nazwy kolejnych klas. Indeksem tablicy sa etykiety z DataSetLabels_T.
+     * @param select_k        Ile cech nalezy wybrac.
+     * @return Tablica cech, ktore sa najlepsze do liniowej dyskryminacji.
+     */
     public int[] get_features(double[][] DataSet_N, int[] DataSetLabels_T, String[] ClassNames, int select_k) {
         if (ClassNames.length != 2) {
             throw new RuntimeException();

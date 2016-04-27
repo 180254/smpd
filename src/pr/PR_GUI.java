@@ -3,6 +3,7 @@ package pr;
 import Jama.Matrix;
 import classifier.*;
 import featurespace.FisherDiscriminant;
+import featurespace.SequentialFS;
 import utils.Utils2;
 
 import javax.swing.*;
@@ -234,7 +235,8 @@ public class PR_GUI extends javax.swing.JFrame {
         jPanel3.add(jLabel10);
         jLabel10.setBounds(200, 50, 49, 16);
 
-        f_combo_criterion.setModel(new javax.swing.DefaultComboBoxModel(new String[]{"Fisher discriminant", "Classification error"}));
+        f_combo_criterion.setModel(new javax.swing.DefaultComboBoxModel(
+                new String[]{"Fisher discriminant", "Sequential Forward Selection", "Classification error"}));
         f_combo_criterion.setEnabled(false);
         jPanel3.add(f_combo_criterion);
         f_combo_criterion.setBounds(160, 70, 140, 22);
@@ -409,14 +411,30 @@ public class PR_GUI extends javax.swing.JFrame {
     private void b_deriveFSActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_b_deriveFSActionPerformed
         // derive optimal feature space
         if (DataSet_N == null) return;
-        if (f_rb_sel.isSelected()) {
-            // the chosen strategy is feature selection
-            int newFeatureCount = Integer.parseInt((String) selbox_nfeat.getSelectedItem());
-            int[] flags = new int[newFeatureCount];
-            selectFeatures(flags, newFeatureCount);
-            DataSetNew_N = Utils2.extract_rows(DataSet_N, flags);
 
-        } else if (f_rb_extr.isSelected()) {
+        if (f_rb_sel.isSelected()) { // selection
+            if (f_combo_criterion.getSelectedIndex() == 0) { // fisher
+                // the chosen strategy is feature selection
+                int newFeatureCount = Integer.parseInt((String) selbox_nfeat.getSelectedItem());
+                int[] flags = new int[newFeatureCount];
+                selectFeatures(flags, newFeatureCount);
+                DataSetNew_N = Utils2.extract_rows(DataSet_N, flags);
+
+            } else if (f_combo_criterion.getSelectedIndex() == 1) { // sfs
+                // 208316: liczenie SFS
+                TimeStart = System.currentTimeMillis();
+
+                int newFeatureCount = Integer.parseInt((String) selbox_nfeat.getSelectedItem());
+                int[] features = new SequentialFS().get_features(DataSet_N, ClassLabels, ClassNames, newFeatureCount);
+                System.out.println("SFS = " + Arrays.toString(features));
+
+                TimeStop = System.currentTimeMillis();
+                System.out.println(String.format("SFS time: %.3fs", (TimeStop - TimeStart) / 1000.0));
+
+                DataSetNew_N = Utils2.extract_rows(DataSet_N, features);
+            }
+
+        } else if (f_rb_extr.isSelected()) { // extraction
             double TotEnergy = Double.parseDouble(tf_PCA_Energy.getText()) / 100.0;
             // Target dimension (if k>0) or flag for energy-based dimension (k=0)
             int k = 0;
