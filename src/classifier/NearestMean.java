@@ -164,6 +164,7 @@ public class NearestMean extends Classifier {
                 } catch (RuntimeException e) {
                     if (retries++ > MAX_RETRY)
                         break;
+//                    System.out.printf("k = %d -> repeating mods calculatio (%s)%n", cur_k, e.getMessage());
                     cur_k--;
                 }
             } // end: kazde k
