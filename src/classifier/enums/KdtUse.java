@@ -1,4 +1,4 @@
-package classifier;
+package classifier.enums;
 
 public enum KdtUse {
     True, False;

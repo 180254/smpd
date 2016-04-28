@@ -1,5 +1,7 @@
 package classifier;
 
+import classifier.enums.ClassType;
+import classifier.enums.DistanceType;
 import pr.KnownException;
 import utils.Math2;
 import utils.Matrix2;
@@ -9,46 +11,43 @@ import utils.Utils2;
 import java.util.ArrayList;
 import java.util.List;
 
-public class NearestMean extends Classifier {
+public class NearestMean implements Classifier {
 
+    private Dataset ds;
     private DistanceType distanceType;
     private ClassType classType;
 
-    double[][][] TrainingSets_N; // [class_id][feature][sample]
-    double[][][] TrainingSets_T; // [class_id][sample][feature]
     List<List<double[][]>> TrainingSetsMeans_N; // [class_id][mod_id][feature_mean][1]
     List<List<double[][]>> TrainingSetsCovarianceInv; // [class_id][mod_id][cov_inv,cov_inv]
 
     final int MAX_RETRY = 10;
     final int K_MIN = 1;
-    final int K_MAX = 15;
+    final int K_MAX = 10;
 
-    public NearestMean(DistanceType distanceType, ClassType classType) {
+    public NearestMean(Dataset ds, DistanceType distanceType, ClassType classType) {
+        this.ds = ds;
         this.distanceType = distanceType;
         this.classType = classType;
     }
 
     @Override
     public void trainClassifier() {
-        // extract training set for each class
-        TrainingSets_T = Utils2.extract_classes_t(TrainingSet_T, TrainingLabels_T, ClassNames);
-        TrainingSets_N = Utils2.extract_classes_n(TrainingSets_T);
         TrainingSetsMeans_N = new ArrayList<>();
         TrainingSetsCovarianceInv = new ArrayList<>();
 
         // dla każdej klasy
         // each_class:
-        for (int classId = 0; classId < TrainingSets_N.length; classId++) {
+        for (int classId = 0; classId < ds.TrainingSets_N.length; classId++) {
 
             // w przypadku NN (bez k) zakladamy, ze klasa ma jeden mod
             // srednia i kowariancja jest liczona dla calej klasy
-            if (classType == ClassType.ONE) {
+            if (classType == ClassType.One) {
 
-                double[][] means_n = Math2.means_n(TrainingSets_N[classId]);
+                double[][] means_n = Math2.means_n(ds.TrainingSets_N[classId]);
                 TrainingSetsMeans_N.add(new ArrayList<>());
                 TrainingSetsMeans_N.get(classId).add(means_n);
 
-                double[][] covariance = Math2.covariance(TrainingSets_N[classId]);
+                double[][] covariance = Math2.covariance(ds.TrainingSets_N[classId]);
                 double[][] covarianceInv = Matrix2.inverse(covariance);
                 TrainingSetsCovarianceInv.add(new ArrayList<>());
                 TrainingSetsCovarianceInv.get(classId).add(covarianceInv);
@@ -65,7 +64,7 @@ public class NearestMean extends Classifier {
 
             int retries = 0;
             // dla kazdego sprawdzanego k
-            for (int cur_k = K_MIN; cur_k < K_MAX; cur_k++) {
+            for (int cur_k = K_MIN; cur_k <= K_MAX; cur_k++) {
 
                 try {
                     // srednie; macierze kowariancji dla kazdego skupistka
@@ -77,7 +76,7 @@ public class NearestMean extends Classifier {
 
                     // wstepnie wylosowana srednia dla kazdego skupiska;
                     for (int ki = 0; ki < cur_k; ki++) {
-                        Mod_Means_N.add(Utils2.random_mean_n(TrainingSets_N[classId]));
+                        Mod_Means_N.add(Utils2.random_mean_n(ds.TrainingSets_N[classId]));
                     }
 
                     // iteracyjne poprawianie sredniej
@@ -90,8 +89,8 @@ public class NearestMean extends Classifier {
                         Mod_Errors.clear();
 
                         // klasyfikowanie kazdej probki i policzenie bledu
-                        for (int ti = 0; ti < TrainingSets_T[classId].length; ti++) {
-                            double[] sample_v = TrainingSets_T[classId][ti];
+                        for (int ti = 0; ti < ds.TrainingSets_T[classId].length; ti++) {
+                            double[] sample_v = ds.TrainingSets_T[classId][ti];
                             double[] distances_v = new double[cur_k];
 
                             for (int ki = 0; ki < cur_k; ki++) {
@@ -111,7 +110,7 @@ public class NearestMean extends Classifier {
                                 continue;
 
                             int[] trainingIndexes = Utils2.to_int_array(Mod_TrainingIndexes_T.get(ki));
-                            double[][] ki_dataset_t = Utils2.extract_rows(TrainingSets_T[classId], trainingIndexes);
+                            double[][] ki_dataset_t = Utils2.extract_rows(ds.TrainingSets_T[classId], trainingIndexes);
                             double[][] ki_dataset_n = Matrix2.transpose(ki_dataset_t);
                             Mod_Means_N.set(ki, Math2.means_n(ki_dataset_n));
                         }
@@ -135,7 +134,7 @@ public class NearestMean extends Classifier {
                                 continue;
                             }
                             int[] trainingIndexes = Utils2.to_int_array(Mod_TrainingIndexes_T.get(ki));
-                            double[][] ki_dataset_t = Utils2.extract_rows(TrainingSets_T[classId], trainingIndexes);
+                            double[][] ki_dataset_t = Utils2.extract_rows(ds.TrainingSets_T[classId], trainingIndexes);
                             double[][] ki_dataset_n = Matrix2.transpose(ki_dataset_t);
 
                             Mod_CovariancesInv.add(ki, Matrix2.inverse(Math2.covariance(ki_dataset_n)));
@@ -176,7 +175,7 @@ public class NearestMean extends Classifier {
 
             // policzenie najlepszego k
             int bestK = Math2.inflection_point(Utils2.to_dbl_array(K_Mean_Errors));
-            int bestKi = bestK - K_MIN;
+            int bestKi = bestK - 1;
 
             // policzenie efektywnego K
             int[] empty_mod = Utils2.empty_lists_ids(K_Mod_TrainingIndexes_T.get(bestKi));
@@ -202,13 +201,13 @@ public class NearestMean extends Classifier {
     @Override
     public double testClassifier() {
         int ok = 0;
-        int maxOk = TestSet_T.length;
+        int maxOk = ds.TestSet_T.length;
 
-        for (int i = 0; i < TestSet_T.length; i++) {
+        for (int i = 0; i < ds.TestSet_T.length; i++) {
 
             try {
-                int classLabel = nearestMean(TestSet_T[i]);
-                int properLabel = TestLabels_T[i];
+                int classLabel = nearestMean(ds.TestSet_T[i]);
+                int properLabel = ds.TestLabels_T[i];
                 if (properLabel == classLabel) ok++;
 
             } catch (KnownException ex) {
@@ -217,7 +216,7 @@ public class NearestMean extends Classifier {
             }
         }
 
-        System.out.printf("Straconych próbek testowych: %d/%d%n", TestSet_T.length - maxOk, TestSet_T.length);
+        System.out.printf("Straconych próbek testowych: %d/%d%n", ds.TestSet_T.length - maxOk, ds.TestSet_T.length);
         return ok / (double) maxOk;
     }
 
@@ -225,7 +224,7 @@ public class NearestMean extends Classifier {
      * wynik = indeks wskazujacy do ktorej klasy (label) jest najblizej
      */
     private int nearestMean(double[] features_v) {
-        int classLength = ClassNames.length;
+        int classLength = ds.ClassNames.length;
         double[] distances = new double[classLength];
 
         for (int cur_class = 0; cur_class < classLength; cur_class++) {

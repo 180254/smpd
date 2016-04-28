@@ -2,6 +2,9 @@ package pr;
 
 import Jama.Matrix;
 import classifier.*;
+import classifier.enums.ClassType;
+import classifier.enums.DistanceType;
+import classifier.enums.KdtUse;
 import featurespace.FisherDiscriminant;
 import featurespace.SequentialFS;
 import utils.Matrix2;
@@ -9,6 +12,7 @@ import utils.Utils2;
 
 import javax.swing.*;
 import javax.swing.filechooser.FileNameExtensionFilter;
+import java.awt.event.ActionEvent;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
@@ -98,6 +102,7 @@ public class PR_GUI extends javax.swing.JFrame {
         jLabel17 = new javax.swing.JLabel();
         jButton1 = new javax.swing.JButton();
         jButton3 = new javax.swing.JButton();
+        jButton5 = new javax.swing.JButton();
         jPanel5 = new javax.swing.JPanel();
         jLabel2 = new javax.swing.JLabel();
         l_FLD_winner = new javax.swing.JLabel();
@@ -131,39 +136,39 @@ public class PR_GUI extends javax.swing.JFrame {
         javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
         jPanel2.setLayout(jPanel2Layout);
         jPanel2Layout.setHorizontalGroup(
-                jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                        .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel2Layout.createSequentialGroup()
-                                .addContainerGap()
-                                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                        .addGroup(jPanel2Layout.createSequentialGroup()
-                                                .addComponent(l_dataset_name_l)
-                                                .addGap(18, 18, 18)
-                                                .addComponent(l_dataset_name))
-                                        .addComponent(jLabel1))
-                                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                        .addGroup(jPanel2Layout.createSequentialGroup()
-                                                .addGap(115, 115, 115)
-                                                .addComponent(jLabel3))
-                                        .addGroup(jPanel2Layout.createSequentialGroup()
-                                                .addGap(94, 94, 94)
-                                                .addComponent(jLabel4)
-                                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                                .addComponent(l_nfeatures)))
-                                .addGap(100, 100, 100))
+            jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel2Layout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(jPanel2Layout.createSequentialGroup()
+                        .addComponent(l_dataset_name_l)
+                        .addGap(18, 18, 18)
+                        .addComponent(l_dataset_name))
+                    .addComponent(jLabel1))
+                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(jPanel2Layout.createSequentialGroup()
+                        .addGap(115, 115, 115)
+                        .addComponent(jLabel3))
+                    .addGroup(jPanel2Layout.createSequentialGroup()
+                        .addGap(94, 94, 94)
+                        .addComponent(jLabel4)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(l_nfeatures)))
+                .addGap(100, 100, 100))
         );
         jPanel2Layout.setVerticalGroup(
-                jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                        .addGroup(jPanel2Layout.createSequentialGroup()
-                                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                                        .addComponent(jLabel1)
-                                        .addComponent(jLabel3))
-                                .addGap(10, 10, 10)
-                                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                                        .addComponent(l_dataset_name_l)
-                                        .addComponent(jLabel4)
-                                        .addComponent(l_dataset_name)
-                                        .addComponent(l_nfeatures))
-                                .addContainerGap(24, Short.MAX_VALUE))
+            jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel2Layout.createSequentialGroup()
+                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabel1)
+                    .addComponent(jLabel3))
+                .addGap(10, 10, 10)
+                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(l_dataset_name_l)
+                    .addComponent(jLabel4)
+                    .addComponent(l_dataset_name)
+                    .addComponent(l_nfeatures))
+                .addContainerGap(24, Short.MAX_VALUE))
         );
 
         getContentPane().add(jPanel2);
@@ -258,12 +263,12 @@ public class PR_GUI extends javax.swing.JFrame {
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
         jPanel1Layout.setHorizontalGroup(
-                jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                        .addGap(0, 156, Short.MAX_VALUE)
+            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 156, Short.MAX_VALUE)
         );
         jPanel1Layout.setVerticalGroup(
-                jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                        .addGap(0, 126, Short.MAX_VALUE)
+            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 126, Short.MAX_VALUE)
         );
 
         getContentPane().add(jPanel1);
@@ -327,7 +332,12 @@ public class PR_GUI extends javax.swing.JFrame {
         jButton3.setText("Split & Train & Execute");
         jButton3.addActionListener(this::steActionPerformed);
         jPanel4.add(jButton3);
-        jButton3.setBounds(150, 100, 170, 40);
+        jButton3.setBounds(150, 80, 170, 40);
+
+        jButton5.setText("Train & Execute");
+        jButton5.addActionListener(evt -> teActionPerformed(evt));
+        jPanel4.add(jButton5);
+        jButton5.setBounds(150, 120, 170, 40);
 
         getContentPane().add(jPanel4);
         jPanel4.setBounds(340, 150, 350, 210);
@@ -356,6 +366,7 @@ public class PR_GUI extends javax.swing.JFrame {
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
+
 
     private void f_rb_selActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_f_rb_selActionPerformed
         f_combo_criterion.setEnabled(true);
@@ -412,6 +423,7 @@ public class PR_GUI extends javax.swing.JFrame {
                 selectFeatures(flags, newFeatureCount, skipFeatures);
                 DataSetNew_N = Utils2.extract_rows(DataSet_N, flags);
 
+
             } else if (f_combo_criterion.getSelectedIndex() == 1) { // sfs
                 // 208316: liczenie SFS
                 TimeStart = System.currentTimeMillis();
@@ -443,60 +455,57 @@ public class PR_GUI extends javax.swing.JFrame {
         }
     }//GEN-LAST:event_b_deriveFSActionPerformed
 
+    Dataset ds = new Dataset();
     Classifier classifier = null;
 
     private void b_SplitActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_b_SplitActionPerformed
-        // TODO add your handling code here:
+        if (DataSetNew_N == null) return; // no reduced feature space have been derived
+        System.out.println("----------------------------------------------------");
+        ds.generate(DataSetNew_N, ClassLabels, Double.parseDouble(tf_TrainSetSize.getText()), ClassNames);
     }//GEN-LAST:event_b_SplitActionPerformed
 
     private void b_TrainActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_b_TrainActionPerformed
-
-        if (DataSetNew_N == null) return; // no reduced feature space have been derived
+        if (!ds.splitted()) return;
         TimeStart = System.currentTimeMillis();
 
-
         // 208316, odpowiedni nauczyciel w zaleznosci od tego co zostalo wybrane
-        System.out.println("----------------------------------------------------");
         System.out.println("----------------------------------------------------");
 
         switch (jComboBox2.getSelectedIndex()) {
             case 0:
-                classifier = new NearestNeighbour(ClassType.ONE, KdtUse.False);
+                classifier = new NearestNeighbour(ds, ClassType.One, KdtUse.False);
                 System.out.println("Ustawiono NearestNeighbour Euclidean");
                 break;
             case 1:
-                classifier = new NearestNeighbour(ClassType.ONE, KdtUse.True);
+                classifier = new NearestNeighbour(ds, ClassType.One, KdtUse.True);
                 System.out.println("Ustawiono NearestNeighbour Euclidean K-Dim-Tree");
                 break;
             case 2:
-                classifier = new NearestNeighbour(ClassType.K, KdtUse.False);
+                classifier = new NearestNeighbour(ds, ClassType.K, KdtUse.False);
                 System.out.println("Ustawiono K-NearestNeighbour Euclidean");
                 break;
             case 3:
-                classifier = new NearestNeighbour(ClassType.K, KdtUse.True);
+                classifier = new NearestNeighbour(ds, ClassType.K, KdtUse.True);
                 System.out.println("Ustawiono K-NearestNeighbour Euclidean K-Dim-Tree");
                 break;
             case 4:
-                classifier = new NearestMean(DistanceType.Euclidean, ClassType.ONE);
+                classifier = new NearestMean(ds, DistanceType.Euclidean, ClassType.One);
                 System.out.println("Ustawiono NearestMean Euclidean");
                 break;
             case 5:
-                classifier = new NearestMean(DistanceType.Mahalanobis, ClassType.ONE);
+                classifier = new NearestMean(ds, DistanceType.Mahalanobis, ClassType.One);
                 System.out.println("Ustawiono NearestMean Mahalanobis");
             case 6:
-                classifier = new NearestMean(DistanceType.Euclidean, ClassType.K);
+                classifier = new NearestMean(ds, DistanceType.Euclidean, ClassType.K);
                 System.out.println("Ustawiono K-NearestMean Euclidean");
                 break;
             case 7:
-                classifier = new NearestMean(DistanceType.Mahalanobis, ClassType.K);
+                classifier = new NearestMean(ds, DistanceType.Mahalanobis, ClassType.K);
                 System.out.println("Ustawiono K-NearestMean Mahalanobis");
                 break;
         }
 
-        // first step: split dataset (in new feature space) into training / testing parts
-        classifier.generateTrainingAndTestSets(DataSetNew_N, ClassLabels, Double.parseDouble(tf_TrainSetSize.getText()), ClassNames);
         classifier.trainClassifier();
-
         TimeStop = System.currentTimeMillis();
         System.out.println(String.format("Trening zakonczono. %.3fs", (TimeStop - TimeStart) / 1000.0));
 
@@ -512,11 +521,17 @@ public class PR_GUI extends javax.swing.JFrame {
         System.out.println(String.format("Skutecznosc: %.4f / czas: %.3fs", test, (TimeStop - TimeStart) / 1000.0));
     }
 
-    private void steActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_steActionPerformed
+    private void teActionPerformed(ActionEvent evt) {
+        b_TrainActionPerformed(null);
+        b_ExecuteActionPerformed(null);
+    }
+
+
+    private void steActionPerformed(java.awt.event.ActionEvent evt) {                                    
         b_SplitActionPerformed(null);
         b_TrainActionPerformed(null);
         b_ExecuteActionPerformed(null);
-    }//GEN-LAST:event_steActionPerformed`
+    }                                    
 
 
     /**
@@ -538,6 +553,7 @@ public class PR_GUI extends javax.swing.JFrame {
     private javax.swing.JButton jButton2;
     private javax.swing.JButton jButton3;
     private javax.swing.JButton jButton4;
+    private javax.swing.JButton jButton5;
     private javax.swing.JComboBox jComboBox2;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel10;
