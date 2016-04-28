@@ -2,42 +2,24 @@ package classifier;
 
 import pr.KnownException;
 import utils.Math2;
-import utils.Matrix2;
 import utils.Utils2;
 
 public class NearestNeighbour extends Classifier {
 
-    private boolean useKdt;
+    private KdtUse kdtUse;
     private KdtNode kdt; // drzewo k-dim-tree
 
-    private DistanceType distanceType;
     private ClassType classType;
     private Integer kParam;
 
-    private double[][][] CovarianceInv; // [class_id][mod_id][cov_inv,cov_inv]
-
-    public NearestNeighbour(DistanceType distanceType, ClassType classType, boolean useKdt) {
-        this.distanceType = distanceType;
+    public NearestNeighbour(ClassType classType, KdtUse kdtUse) {
         this.classType = classType;
-        this.useKdt = useKdt;
+        this.kdtUse = kdtUse;
     }
 
     @Override
     public void trainClassifier() {
-        if (distanceType == DistanceType.Mahalanobis) {
-            // macierze kowariancji dla kazdej klasy
-
-            CovarianceInv = new double[ClassNames.length][][];
-
-            double[][][] TrainingSets_T = Utils2.extract_classes_t(TrainingSet_T, TrainingLabels_T, ClassNames);
-            double[][][] TrainingSets_N = Utils2.extract_classes_n(TrainingSets_T);
-
-            for (int i = 0; i < ClassNames.length; i++) {
-                CovarianceInv[i] = Matrix2.inverse(Math2.covariance(TrainingSets_N[i]));
-            }
-        }
-
-        if (useKdt) {
+        if (kdtUse.shouldUse()) {
             kdt = KdtNode.KdtTree(TrainingSet_T);
             System.out.printf("KDTree: głębokość = %d; indeksów/liść = %d%n",
                     kdt.Depth() + 1, KdtNode.LEAF_IND_LENGTH);
@@ -64,7 +46,9 @@ public class NearestNeighbour extends Classifier {
             try {
                 // jezeli uzywamy kdt wskazujemy odpowiedni lisc z drzewam,
                 // w przeciwnym wypadku przeszukujemy caly TrainingSet_T
-                int[] neighbourIndexes = useKdt ? kdt.FindNeighbours(TestSet_T[i], kParam) : AllTrainingSetIndexes;
+                int[] neighbourIndexes = kdtUse.shouldUse()
+                        ? kdt.FindNeighbours(TestSet_T[i], kParam)
+                        : AllTrainingSetIndexes;
                 if (i == 0) System.out.printf("Użyto próbek treningowych = %d (%.0f%%)%n",
                         neighbourIndexes.length,
                         neighbourIndexes.length / (double) AllTrainingSetIndexes.length * 100);
@@ -96,18 +80,7 @@ public class NearestNeighbour extends Classifier {
 
         for (int i = 0; i < Training_Indexes.length; i++) {
             int trainIndex = Training_Indexes[i];
-
-            if (distanceType == DistanceType.Euclidean) {
-                distances[i] = Math2.distance_euclidean(features_v, TrainingSet_T[trainIndex]);
-
-            } else if (distanceType == DistanceType.Mahalanobis) {
-                int classId = TrainingLabels_T[trainIndex];
-                distances[i] = Math2.distance_mahalanobis2(
-                        Matrix2.to_matrix_n(features_v),
-                        Matrix2.to_matrix_n(TrainingSet_T[trainIndex]),
-                        CovarianceInv[classId]);
-            }
-
+            distances[i] = Math2.distance_euclidean(features_v, TrainingSet_T[trainIndex]);
         }
 
         int[] min_dist = Math2.arg_min(distances, kParam);

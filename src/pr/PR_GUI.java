@@ -302,18 +302,14 @@ public class PR_GUI extends javax.swing.JFrame {
 
         jComboBox2.setModel(new javax.swing.DefaultComboBoxModel(
                 new String[]{
-                        "Neighbour-euc",
-                        "Neighbour-euc-kdim",
-                        "Neighbour-moh",
-                        "Neighbour-moh-kdim",
-                        "Mean-euc",
-                        "Mean-moh",
-                        "k-Neighbour-euc",
-                        "k-Neighbour-euc-kdim",
-                        "k-Neighbour-moh",
-                        "k-Neighbour-moh-kdim",
-                        "k-Mean-euc",
-                        "k-Mean-moh"
+                        "NN-euc",
+                        "NN-euc-kdim",
+                        "k-NN-euc",
+                        "k-NN-euc-kdim",
+                        "NM-euc",
+                        "NM-moh",
+                        "k-NM-euc",
+                        "k-NM-moh"
                 }));
         jPanel4.add(jComboBox2);
         jComboBox2.setBounds(74, 41, 178, 22);
@@ -465,24 +461,25 @@ public class PR_GUI extends javax.swing.JFrame {
         if (DataSetNew_N == null) return; // no reduced feature space have been derived
         TimeStart = System.currentTimeMillis();
 
+
         // 208316, odpowiedni nauczyciel w zaleznosci od tego co zostalo wybrane
         System.out.println("----------------------------------------------------");
         switch (jComboBox2.getSelectedIndex()) {
             case 0:
-                classifier = new NearestNeighbour(DistanceType.Euclidean, ClassType.ONE, false);
+                classifier = new NearestNeighbour(ClassType.ONE, KdtUse.False);
                 System.out.println("Ustawiono NearestNeighbour Euclidean");
                 break;
             case 1:
-                classifier = new NearestNeighbour(DistanceType.Euclidean, ClassType.ONE, true);
+                classifier = new NearestNeighbour(ClassType.ONE, KdtUse.True);
                 System.out.println("Ustawiono NearestNeighbour Euclidean K-Dim-Tree");
                 break;
             case 2:
-                classifier = new NearestNeighbour(DistanceType.Mahalanobis, ClassType.ONE, false);
-                System.out.println("Ustawiono NearestNeighbour Mahalanobis");
+                classifier = new NearestNeighbour(ClassType.K, KdtUse.False);
+                System.out.println("Ustawiono K-NearestNeighbour Euclidean");
                 break;
             case 3:
-                classifier = new NearestNeighbour(DistanceType.Mahalanobis, ClassType.ONE, true);
-                System.out.println("Ustawiono NearestNeighbour Mahalanobis K-Dim-Tree");
+                classifier = new NearestNeighbour(ClassType.K, KdtUse.True);
+                System.out.println("Ustawiono K-NearestNeighbour Euclidean K-Dim-Tree");
                 break;
             case 4:
                 classifier = new NearestMean(DistanceType.Euclidean, ClassType.ONE);
@@ -491,28 +488,11 @@ public class PR_GUI extends javax.swing.JFrame {
             case 5:
                 classifier = new NearestMean(DistanceType.Mahalanobis, ClassType.ONE);
                 System.out.println("Ustawiono NearestMean Mahalanobis");
-                break;
             case 6:
-                classifier = new NearestNeighbour(DistanceType.Euclidean, ClassType.K, false);
-                System.out.println("Ustawiono K-NearestNeighbour Euclidean");
-                break;
-            case 7:
-                classifier = new NearestNeighbour(DistanceType.Euclidean, ClassType.K, true);
-                System.out.println("Ustawiono K-NearestNeighbour Euclidean K-Dim-Tree");
-                break;
-            case 8:
-                classifier = new NearestNeighbour(DistanceType.Mahalanobis, ClassType.K, false);
-                System.out.println("Ustawiono K-NearestNeighbour Mahalanobis");
-                break;
-            case 9:
-                classifier = new NearestNeighbour(DistanceType.Mahalanobis, ClassType.K, true);
-                System.out.println("Ustawiono K-NearestNeighbour Mahalanobis K-Dim-Tree");
-                break;
-            case 10:
                 classifier = new NearestMean(DistanceType.Euclidean, ClassType.K);
                 System.out.println("Ustawiono K-NearestMean Euclidean");
                 break;
-            case 11:
+            case 7:
                 classifier = new NearestMean(DistanceType.Mahalanobis, ClassType.K);
                 System.out.println("Ustawiono K-NearestMean Mahalanobis");
                 break;
