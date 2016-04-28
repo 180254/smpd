@@ -1,5 +1,6 @@
 package classifier;
 
+import pr.KnownException;
 import utils.Math2;
 import utils.Matrix2;
 import utils.Matrix3;
@@ -161,7 +162,7 @@ public class NearestMean extends Classifier {
                     K_Mean_Errors.add(meanError);
 
                     retries = 0;
-                } catch (RuntimeException e) {
+                } catch (KnownException e) {
                     if (retries++ > MAX_RETRY)
                         break;
 //                    System.out.printf("k = %d -> repeating mods calculatio (%s)%n", cur_k, e.getMessage());
@@ -170,7 +171,7 @@ public class NearestMean extends Classifier {
             } // end: kazde k
 
             if (K_Mean_Errors.size() == 0) {
-                throw new RuntimeException("Unable to train due to singulars or overflows");
+                throw new KnownException("Unable to train due to singulars or overflows");
             }
 
             // policzenie najlepszego k
@@ -210,13 +211,9 @@ public class NearestMean extends Classifier {
                 int properLabel = TestLabels_T[i];
                 if (properLabel == classLabel) ok++;
 
-            } catch (RuntimeException ex) {
-                if (ex.getMessage() != null &&
-                        (ex.getMessage().contains("singular") || ex.getMessage().contains("overflow"))) {
-                    maxOk--;
-                } else {
-                    throw ex;
-                }
+            } catch (KnownException ex) {
+                maxOk--;
+
             }
         }
 
@@ -257,7 +254,7 @@ public class NearestMean extends Classifier {
                 double[][] point_n = Matrix2.to_matrix_n(features_v);
                 double[][] means_n = TrainingSetsMeans_N.get(classId).get(cur_mod);
                 double[][] covarianceInv = TrainingSetsCovarianceInv.get(classId).get(cur_mod);
-                distances[cur_mod] = Math2.distance_mahalanobis(point_n, means_n, covarianceInv);
+                distances[cur_mod] = Math2.distance_mahalanobis2(point_n, means_n, covarianceInv);
             }
         }
 

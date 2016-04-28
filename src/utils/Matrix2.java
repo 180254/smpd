@@ -1,5 +1,8 @@
 package utils;
 
+import Jama.Matrix;
+import pr.KnownException;
+
 /**
  * Podstawowe operacje na macierzach.
  */
@@ -40,7 +43,23 @@ public class Matrix2 {
      * Odwracanie macierzy.
      */
     public static double[][] inverse(double[][] matrix) {
-        return new Jama.Matrix(matrix).inverse().getArray();
+        double[][] result;
+
+        try {
+            result = new Matrix(matrix).inverse().getArray();
+        } catch (RuntimeException ex) {
+            if (ex.getMessage() != null && ex.getMessage().contains("singular")) {
+                throw new KnownException("singular matrix", ex);
+            } else {
+                throw ex;
+            }
+        }
+
+        if (!Double.isFinite(result[0][0])) {
+            throw new KnownException("after inverse NaN value! overflow!?");
+        }
+
+        return result;
     }
 
     /**

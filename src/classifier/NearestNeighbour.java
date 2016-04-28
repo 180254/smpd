@@ -1,5 +1,6 @@
 package classifier;
 
+import pr.KnownException;
 import utils.Math2;
 import utils.Matrix2;
 import utils.Utils2;
@@ -76,13 +77,8 @@ public class NearestNeighbour extends Classifier {
 
                 if (properLabel == popularLabel) ok++;
 
-            } catch (RuntimeException ex) {
-                if (ex.getMessage() != null &&
-                        (ex.getMessage().contains("singular") || ex.getMessage().contains("overflow"))) {
-                    maxOk--;
-                } else {
-                    throw ex;
-                }
+            } catch (KnownException ex) {
+                maxOk--;
             }
         }
 
@@ -106,7 +102,7 @@ public class NearestNeighbour extends Classifier {
 
             } else if (distanceType == DistanceType.Mahalanobis) {
                 int classId = TrainingLabels_T[trainIndex];
-                distances[i] = Math2.distance_mahalanobis(
+                distances[i] = Math2.distance_mahalanobis2(
                         Matrix2.to_matrix_n(features_v),
                         Matrix2.to_matrix_n(TrainingSet_T[trainIndex]),
                         CovarianceInv[classId]);
