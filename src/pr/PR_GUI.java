@@ -96,6 +96,8 @@ public class PR_GUI extends javax.swing.JFrame {
         jLabel16 = new javax.swing.JLabel();
         tf_TrainSetSize = new javax.swing.JTextField();
         jLabel17 = new javax.swing.JLabel();
+        jButton1 = new javax.swing.JButton();
+        jButton3 = new javax.swing.JButton();
         jPanel5 = new javax.swing.JPanel();
         jLabel2 = new javax.swing.JLabel();
         l_FLD_winner = new javax.swing.JLabel();
@@ -106,13 +108,9 @@ public class PR_GUI extends javax.swing.JFrame {
         getContentPane().setLayout(null);
 
         b_read.setText("Read dataset");
-        b_read.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                b_readActionPerformed(evt);
-            }
-        });
+        b_read.addActionListener(this::b_readActionPerformed);
         getContentPane().add(b_read);
-        b_read.setBounds(20, 10, 130, 25);
+        b_read.setBounds(20, 10, 130, 23);
 
         jPanel2.setBackground(new java.awt.Color(204, 255, 255));
         jPanel2.setBorder(javax.swing.BorderFactory.createEtchedBorder());
@@ -172,13 +170,9 @@ public class PR_GUI extends javax.swing.JFrame {
         jPanel2.setBounds(10, 50, 320, 80);
 
         jButton2.setText("Parse dataset");
-        jButton2.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButton2ActionPerformed(evt);
-            }
-        });
+        jButton2.addActionListener(this::jButton2ActionPerformed);
         getContentPane().add(jButton2);
-        jButton2.setBounds(190, 10, 130, 25);
+        jButton2.setBounds(190, 10, 130, 23);
 
         jPanel3.setBackground(new java.awt.Color(255, 255, 204));
         jPanel3.setBorder(javax.swing.BorderFactory.createEtchedBorder());
@@ -191,81 +185,69 @@ public class PR_GUI extends javax.swing.JFrame {
 
         jLabel6.setText("FS Dimension");
         jPanel3.add(jLabel6);
-        jLabel6.setBounds(178, 9, 78, 16);
+        jLabel6.setBounds(178, 9, 63, 14);
 
         selbox_nfeat.setModel(new javax.swing.DefaultComboBoxModel(new String[]{"1"}));
         selbox_nfeat.setEnabled(true);
         jPanel3.add(selbox_nfeat);
-        selbox_nfeat.setBounds(268, 6, 34, 22);
+        selbox_nfeat.setBounds(268, 6, 31, 20);
         jPanel3.add(jSeparator1);
         jSeparator1.setBounds(14, 41, 290, 10);
 
         f_rb_extr.setBackground(new java.awt.Color(255, 255, 204));
         rbg_F.add(f_rb_extr);
         f_rb_extr.setText("Feature extraction");
-        f_rb_extr.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                f_rb_extrActionPerformed(evt);
-            }
-        });
+        f_rb_extr.addActionListener(this::f_rb_extrActionPerformed);
         jPanel3.add(f_rb_extr);
-        f_rb_extr.setBounds(10, 110, 133, 25);
+        f_rb_extr.setBounds(10, 110, 115, 23);
 
         f_rb_sel.setBackground(new java.awt.Color(255, 255, 204));
         rbg_F.add(f_rb_sel);
         f_rb_sel.setSelected(true);
         f_rb_sel.setText("Feature selection");
-        f_rb_sel.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                f_rb_selActionPerformed(evt);
-            }
-        });
+        f_rb_sel.addActionListener(this::f_rb_selActionPerformed);
         jPanel3.add(f_rb_sel);
-        f_rb_sel.setBounds(10, 60, 127, 25);
+        f_rb_sel.setBounds(10, 60, 109, 23);
 
         b_deriveFS.setText("Derive Feature Space");
-        b_deriveFS.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                b_deriveFSActionPerformed(evt);
-            }
-        });
+        b_deriveFS.addActionListener(this::b_deriveFSActionPerformed);
         jPanel3.add(b_deriveFS);
-        b_deriveFS.setBounds(10, 180, 292, 25);
+        b_deriveFS.setBounds(10, 180, 292, 23);
 
         jLabel10.setText("Criterion");
         jPanel3.add(jLabel10);
-        jLabel10.setBounds(200, 50, 49, 16);
+        jLabel10.setBounds(200, 50, 41, 14);
 
         f_combo_criterion.setModel(new javax.swing.DefaultComboBoxModel(
                 new String[]{"Fisher discriminant", "Sequential Forward Selection", "Classification error"}));
         f_combo_criterion.setEnabled(false);
         jPanel3.add(f_combo_criterion);
-        f_combo_criterion.setBounds(160, 70, 140, 22);
+        f_combo_criterion.setBounds(160, 70, 140, 20);
 
         f_combo_PCA_LDA.setModel(new javax.swing.DefaultComboBoxModel(new String[]{"PCA", "LDA"}));
         f_combo_PCA_LDA.setEnabled(false);
         jPanel3.add(f_combo_PCA_LDA);
-        f_combo_PCA_LDA.setBounds(190, 110, 70, 22);
+        f_combo_PCA_LDA.setBounds(190, 110, 70, 20);
 
         jLabel12.setText("Energy");
         jPanel3.add(jLabel12);
-        jLabel12.setBounds(20, 150, 39, 16);
+        jLabel12.setBounds(20, 150, 34, 14);
 
         tf_PCA_Energy.setText("80");
         jPanel3.add(tf_PCA_Energy);
-        tf_PCA_Energy.setBounds(70, 150, 30, 22);
+        tf_PCA_Energy.setBounds(70, 150, 30, 20);
 
         jLabel14.setText("%");
         jPanel3.add(jLabel14);
-        jLabel14.setBounds(110, 150, 20, 16);
+        jLabel14.setBounds(110, 150, 20, 14);
 
         jLabel15.setText("New dimension:");
         jPanel3.add(jLabel15);
-        jLabel15.setBounds(160, 150, 92, 16);
+        jLabel15.setBounds(160, 150, 75, 14);
 
         l_NewDim.setText("...");
         jPanel3.add(l_NewDim);
-        l_NewDim.setBounds(270, 150, 30, 16);
+        l_NewDim.setBounds(270, 150, 30, 14);
 
         getContentPane().add(jPanel3);
         jPanel3.setBounds(10, 140, 320, 220);
@@ -298,7 +280,7 @@ public class PR_GUI extends javax.swing.JFrame {
 
         jLabel9.setText("Method");
         jPanel4.add(jLabel9);
-        jLabel9.setBounds(14, 44, 42, 16);
+        jLabel9.setBounds(14, 44, 36, 14);
 
         jComboBox2.setModel(new javax.swing.DefaultComboBoxModel(
                 new String[]{
@@ -312,34 +294,40 @@ public class PR_GUI extends javax.swing.JFrame {
                         "k-NM-moh"
                 }));
         jPanel4.add(jComboBox2);
-        jComboBox2.setBounds(74, 41, 178, 22);
+        jComboBox2.setBounds(74, 41, 152, 20);
 
         b_Train.setText("Train");
-        b_Train.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                b_TrainActionPerformed(evt);
-            }
-        });
+        b_Train.addActionListener(this::b_TrainActionPerformed);
         jPanel4.add(b_Train);
-        b_Train.setBounds(40, 130, 98, 25);
+        b_Train.setBounds(40, 110, 100, 23);
 
         jButton4.setText("Execute");
         jButton4.addActionListener(this::b_ExecuteActionPerformed);
-
         jPanel4.add(jButton4);
-        jButton4.setBounds(210, 130, 96, 25);
+        jButton4.setBounds(40, 130, 100, 23);
 
         jLabel16.setText("Training part:");
         jPanel4.add(jLabel16);
-        jLabel16.setBounds(20, 170, 80, 16);
+        jLabel16.setBounds(20, 170, 80, 14);
 
         tf_TrainSetSize.setText("80");
         jPanel4.add(tf_TrainSetSize);
-        tf_TrainSetSize.setBounds(110, 170, 20, 22);
+        tf_TrainSetSize.setBounds(110, 170, 20, 20);
 
         jLabel17.setText("%");
         jPanel4.add(jLabel17);
-        jLabel17.setBounds(140, 170, 20, 16);
+        jLabel17.setBounds(140, 170, 20, 14);
+
+        jButton1.setText("Split");
+        jButton1.setActionCommand("splitButton");
+        jButton1.addActionListener(this::b_SplitActionPerformed);
+        jPanel4.add(jButton1);
+        jButton1.setBounds(40, 90, 100, 23);
+
+        jButton3.setText("Split & Train & Execute");
+        jButton3.addActionListener(this::steActionPerformed);
+        jPanel4.add(jButton3);
+        jButton3.setBounds(150, 100, 170, 40);
 
         getContentPane().add(jPanel4);
         jPanel4.setBounds(340, 150, 350, 210);
@@ -349,19 +337,19 @@ public class PR_GUI extends javax.swing.JFrame {
 
         jLabel2.setText("FS Winner:");
         jPanel5.add(jLabel2);
-        jLabel2.setBounds(10, 30, 70, 16);
+        jLabel2.setBounds(10, 30, 70, 14);
 
         l_FLD_winner.setText("xxx");
         jPanel5.add(l_FLD_winner);
-        l_FLD_winner.setBounds(100, 30, 18, 16);
+        l_FLD_winner.setBounds(100, 30, 18, 14);
 
         jLabel13.setText("FLD value: ");
         jPanel5.add(jLabel13);
-        jLabel13.setBounds(10, 60, 70, 16);
+        jLabel13.setBounds(10, 60, 70, 14);
 
         l_FLD_val.setText("vvv");
         jPanel5.add(l_FLD_val);
-        l_FLD_val.setBounds(100, 60, 48, 16);
+        l_FLD_val.setBounds(100, 60, 48, 14);
 
         getContentPane().add(jPanel5);
         jPanel5.setBounds(340, 10, 160, 130);
@@ -384,6 +372,7 @@ public class PR_GUI extends javax.swing.JFrame {
         InData = readDataSet();
     }//GEN-LAST:event_b_readActionPerformed
 
+    @SuppressWarnings("unchecked")
     private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
         // Analyze text inputted from a file: determine class number and labels and number
         // of features; build feature matrix: columns - samples, rows - features
@@ -456,6 +445,10 @@ public class PR_GUI extends javax.swing.JFrame {
 
     Classifier classifier = null;
 
+    private void b_SplitActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_b_SplitActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_b_SplitActionPerformed
+
     private void b_TrainActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_b_TrainActionPerformed
 
         if (DataSetNew_N == null) return; // no reduced feature space have been derived
@@ -464,6 +457,8 @@ public class PR_GUI extends javax.swing.JFrame {
 
         // 208316, odpowiedni nauczyciel w zaleznosci od tego co zostalo wybrane
         System.out.println("----------------------------------------------------");
+        System.out.println("----------------------------------------------------");
+
         switch (jComboBox2.getSelectedIndex()) {
             case 0:
                 classifier = new NearestNeighbour(ClassType.ONE, KdtUse.False);
@@ -517,15 +512,18 @@ public class PR_GUI extends javax.swing.JFrame {
         System.out.println(String.format("Skutecznosc: %.4f / czas: %.3fs", test, (TimeStop - TimeStart) / 1000.0));
     }
 
+    private void steActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_steActionPerformed
+        b_SplitActionPerformed(null);
+        b_TrainActionPerformed(null);
+        b_ExecuteActionPerformed(null);
+    }//GEN-LAST:event_steActionPerformed`
+
+
     /**
      * @param args the command line arguments
      */
     public static void main(String args[]) {
-        java.awt.EventQueue.invokeLater(new Runnable() {
-            public void run() {
-                new PR_GUI().setVisible(true);
-            }
-        });
+        java.awt.EventQueue.invokeLater(() -> new PR_GUI().setVisible(true));
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
@@ -536,7 +534,9 @@ public class PR_GUI extends javax.swing.JFrame {
     private javax.swing.JComboBox f_combo_criterion;
     private javax.swing.JRadioButton f_rb_extr;
     private javax.swing.JRadioButton f_rb_sel;
+    private javax.swing.JButton jButton1;
     private javax.swing.JButton jButton2;
+    private javax.swing.JButton jButton3;
     private javax.swing.JButton jButton4;
     private javax.swing.JComboBox jComboBox2;
     private javax.swing.JLabel jLabel1;
