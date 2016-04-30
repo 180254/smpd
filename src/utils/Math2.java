@@ -1,7 +1,5 @@
 package utils;
 
-import pr.KnownException;
-
 import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -188,26 +186,12 @@ public class Math2 {
 
         double[][] result1 = Matrix2.multiply(x_minus_means_t, k_covarianceInv);
         double[][] result2 = Matrix2.multiply(result1, x_minus_means_n);
-//
-//        if (Matrix3.equals(result2[0][0], 0, 1e-20)) {
-//            result2[0][0] = 0;
-//        }
-//
-//        if (result2[0][0] < 0 || !Double.isFinite(result2[0][0])) {
-//            throw new KnownException("distance<0 or NaN! overflow!?");
-//        }
-        return result2[0][0];
-    }
 
-    /**
-     * TODO: opisać
-     */
-    public static double distance_mahalanobis2(double[][] point_n, double[][] k_means_n, double[][] k_covarianceInv) {
-//        try {
-        return Math2.distance_mahalanobis(point_n, k_means_n, k_covarianceInv);
-//        } catch (KnownException ex) {
-//            return Double.MAX_VALUE;
-//        }
+        if (!Double.isFinite(result2[0][0])) {
+            throw new RuntimeException("distance element NaN! overflow!?");
+        }
+
+        return result2[0][0];
     }
 
     /**
@@ -304,7 +288,7 @@ public class Math2 {
         double[][] multiply = Matrix2.multiply(datasetCAM_n, datasetCAM_t);
 
         if (!Double.isFinite(multiply[0][0])) {
-            throw new KnownException("covariance element NaN! overflow!?");
+            throw new RuntimeException("covariance element NaN! overflow!?");
         }
 
         return Matrix2.multiply(multiply, normalizeMultiplier);

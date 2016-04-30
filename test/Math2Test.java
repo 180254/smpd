@@ -1,6 +1,6 @@
 import org.junit.Assert;
 import org.junit.Test;
-import pr.KnownException;
+import pr.InvertException;
 import utils.Math2;
 import utils.Matrix2;
 import utils.Matrix3;
@@ -373,7 +373,7 @@ public class Math2Test {
         Assert.assertEquals(expected, result, 1e-3);
     }
 
-    @Test
+    @Test(expected = InvertException.class)
     public void distance_mahalanobis_test_true4() {
         double[][] point_n = {
                 {-5}};
@@ -382,9 +382,7 @@ public class Math2Test {
                 {-5}
         };
         double expected = Double.NaN; // octave mahal
-
         double result = Math2.distance_mahalanobis(point_n, dataset_n);
-        System.out.println("//////////"+result);
 //        Assert.assertEquals(expected, result, 1e-3);
     }
 

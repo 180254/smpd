@@ -235,7 +235,7 @@ public class NearestMean implements Classifier {
                 double[][] point_n = Matrix2.to_matrix_n(features_v);
                 double[][] means_n = Class_Mod_TrainingSetsMeans_N.get(classId).get(cur_mod);
                 double[][] covarianceInv = Class_Mod_TrainingSetsCovarianceInv.get(classId).get(cur_mod);
-                distances[cur_mod] = Math2.distance_mahalanobis2(point_n, means_n, covarianceInv);
+                distances[cur_mod] = Math2.distance_mahalanobis(point_n, means_n, covarianceInv);
             }
         }
 
