@@ -9,7 +9,9 @@ import utils.Matrix3;
 import utils.Utils2;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class NearestMean implements Classifier {
 
@@ -70,28 +72,41 @@ public class NearestMean implements Classifier {
             // dla kazdego sprawdzanego k
             all_k_loop:
             for (int cur_k = K_MIN; cur_k <= K_MAX; cur_k++) {
-                // srednie; macierze kowariancji dla kazdego skupistka
-                // lista indeksow dla kazdego skupistka; popelnione bledy
+                // srednie; macierze kowariancji dla kazdego skupistka; popelnione bledy
                 List<double[][]> Mod_Means_N = new ArrayList<>(); // [mod_id][feature_mean,1]
                 List<double[][]> Mod_CovariancesInv = new ArrayList<>(); // [mod_id][cov_inv,cov_inv]
-                List<List<Integer>> Mod_TrainingIndexes_T = new ArrayList<>(); // [mod_id] list<indexes>
                 List<Double> Mod_Errors = new ArrayList<>(); // list <errors>
 
+                // lista indeksow dla kazdego skupistka;
+                List<List<Integer>> Mod_TrainingIndexes_T = new ArrayList<>(); // [mod_id] list<indexes>
+                Map<Integer, Integer> TrainingIndexToModId = new HashMap<>(); // TrainingIndex -> mod_id
+
                 // wstepnie wylosowana srednia dla kazdego skupiska;
+                random_mean_loop:
                 for (int mod_i = 0; mod_i < cur_k; mod_i++) {
-                    Mod_Means_N.add(Utils2.random_mean_n2(ds.TrainingSets_N[classId]));
+                    double[][] random_mean = Utils2.random_mean_n2(ds.TrainingSets_N[classId]);
+
+                    // nalezy sie uprawnic, czy taki srodek juz nie zostal wczesniej wylosowany
+                    for (double[][] modMeanN : Mod_Means_N) {
+                        if (Matrix3.equals(random_mean, modMeanN, 1e-20)) {
+                            mod_i--;
+                            continue random_mean_loop;
+                        }
+                    }
+
+                    Mod_Means_N.add(random_mean);
                 }
 
                 // iteracyjne poprawianie sredniej; policzenie wartosci dla modu
                 boolean doNextIteration;
                 do {
                     Mod_TrainingIndexes_T.clear();
+                    TrainingIndexToModId.clear();
                     for (int ki = 0; ki < cur_k; ki++) {
                         Mod_TrainingIndexes_T.add(new ArrayList<>());
                     }
-                    Mod_Errors.clear();
 
-                    // klasyfikowanie kazdej probki i policzenie bledu
+                    // klasyfikowanie kazdej probki
                     for (int ti = 0; ti < ds.TrainingSets_T[classId].length; ti++) {
                         double[] sample_v = ds.TrainingSets_T[classId][ti];
 
@@ -103,7 +118,7 @@ public class NearestMean implements Classifier {
 
                         int bestMod = Math2.arg_min(distances_v);
                         Mod_TrainingIndexes_T.get(bestMod).add(ti);
-                        Mod_Errors.add(distances_v[bestMod]);
+                        TrainingIndexToModId.put(ti, bestMod);
                     }
 
                     // pobliczenie nowej sredniej i jej korekta
@@ -154,13 +169,19 @@ public class NearestMean implements Classifier {
                     }
                 }
 
+                // policzenie bledow - odleglosci od modu, do ktorego probka nalezy
+                for (int ti = 0; ti < ds.TrainingSets_T[classId].length; ti++) {
+                    int bestMod = TrainingIndexToModId.get(ti);
+                    double[] sample_v = ds.TrainingSets_T[classId][ti];
+                    double[] mean_v = Matrix2.to_vector_n(Mod_Means_N.get(bestMod));
+                    Mod_Errors.add(Math2.distance_euclidean(sample_v, mean_v));
+                }
+
                 // sredni popelniony blad
                 double meanError = Mod_Errors.stream().mapToDouble(d -> d).average().orElse(0);
                 // System.out.println(String.format("%.15f", meanError).replace(".", ","));
                 System.out.println(String.format("c=%d // k=%2d // %.15f // %s",
-                        classId,
-                        cur_k,
-                        meanError,
+                        classId, cur_k, meanError,
                         Mod_TrainingIndexes_T.stream()
                                 .map(List::size).map(String::valueOf)
                                 .reduce((s, s2) -> String.format("%3s, %3s", s, s2))
