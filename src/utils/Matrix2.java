@@ -49,7 +49,7 @@ public class Matrix2 {
             result = new Matrix(matrix).inverse().getArray();
         } catch (RuntimeException ex) {
             if (ex.getMessage() != null && ex.getMessage().contains("singular")) {
-                throw new KnownException("singular matrix", ex);
+                result = PseudoInv.pinv(new Matrix(matrix)).getArray();
             } else {
                 throw ex;
             }

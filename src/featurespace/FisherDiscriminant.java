@@ -19,11 +19,10 @@ public class FisherDiscriminant {
      * @param DataSet_N       Zbior danych treningowych.
      * @param DataSetLabels_T Etykiety, do ktorej klasy naleza kolejne probki.
      * @param ClassNames      Nazwy kolejnych klas. Indeksem tablicy sa etykiety z DataSetLabels_T.
-     * @param select_k        Ile cech nalezy wybrac.
-     * @param skipFeatures    Cechy uznane za niespełniające warunków. Zostana pominiete podczas diskriminacji.
+     * @param select_n        Ile cech nalezy wybrac.
      * @return Tablica cech, ktore sa najlepsze do liniowej dyskryminacji.
      */
-    public static int[] get_features(double[][] DataSet_N, int[] DataSetLabels_T, String[] ClassNames, int select_k, int[] skipFeatures) {
+    public static int[] get_features(double[][] DataSet_N, int[] DataSetLabels_T, String[] ClassNames, int select_n) {
         if (ClassNames.length != 2) {
             throw new RuntimeException();
         }
@@ -33,7 +32,7 @@ public class FisherDiscriminant {
 
         // podzial na klasy
         double[][] DataSet_T = Matrix2.transpose(DataSet_N);
-        double[][][] DataSets_T = Utils2.extract_classes_t(DataSet_T, DataSetLabels_T, ClassNames);
+        double[][][] DataSets_T = Utils2.extract_classes_t(DataSet_T, DataSetLabels_T, ClassNames.length);
         double[][][] DataSets_N = Utils2.extract_classes_n(DataSets_T);
 
         // policzenie srednich dla kazdej z klas
@@ -42,18 +41,16 @@ public class FisherDiscriminant {
             DataSetMeans_N[i] = Math2.means_n(DataSets_N[i]);
         }
 
-        Combinations featuersIt = new Combinations(DataSet_N.length, select_k); // iterator kombinacji
+        Combinations featuersIt = new Combinations(DataSet_N.length, select_n); // iterator kombinacji
         Map<int[], Double> fishers = new ConcurrentHashMap<>(); // wyniki policzonych fisherow
 
         // zebranie wszystkich obliczen do wykonania
         List<Callable<Object>> fisherTasks = new ArrayList<>();
         for (int[] features : featuersIt) {
-            if (!Utils2.contains_any(features, skipFeatures)) {
-                fisherTasks.add(Executors.callable(() -> {
-                    double fisher = fisher2(DataSets_N[0], DataSets_N[1], DataSetMeans_N[0], DataSetMeans_N[1], features);
-                    fishers.put(features, fisher);
-                }));
-            }
+            fisherTasks.add(Executors.callable(() -> {
+                double fisher = fisher2(DataSets_N[0], DataSets_N[1], DataSetMeans_N[0], DataSetMeans_N[1], features);
+                fishers.put(features, fisher);
+            }));
         }
 
         // wykonanie obliczen

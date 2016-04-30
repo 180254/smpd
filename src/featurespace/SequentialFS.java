@@ -16,11 +16,10 @@ public class SequentialFS {
      * @param DataSet_N       Zbior danych treningowych.
      * @param DataSetLabels_T Etykiety, do ktorej klasy naleza kolejne probki.
      * @param ClassNames      Nazwy kolejnych klas. Indeksem tablicy sa etykiety z DataSetLabels_T.
-     * @param select_k        Ile cech nalezy wybrac.
-     * @param skipFeatures    Cechy uznane za niespełniające warunków. Zostana pominiete podczas diskriminacji.
+     * @param select_n        Ile cech nalezy wybrac.
      * @return Tablica cech, ktore sa najlepsze do liniowej dyskryminacji.
      */
-    public static int[] get_features(double[][] DataSet_N, int[] DataSetLabels_T, String[] ClassNames, int select_k, int[] skipFeatures) {
+    public static int[] get_features(double[][] DataSet_N, int[] DataSetLabels_T, String[] ClassNames, int select_n) {
         if (ClassNames.length != 2) {
             throw new RuntimeException();
         }
@@ -29,7 +28,7 @@ public class SequentialFS {
 
         // podzial na klasy
         double[][] DataSet_T = Matrix2.transpose(DataSet_N);
-        double[][][] DataSets_T = Utils2.extract_classes_t(DataSet_T, DataSetLabels_T, ClassNames);
+        double[][][] DataSets_T = Utils2.extract_classes_t(DataSet_T, DataSetLabels_T, ClassNames.length);
         double[][][] DataSets_N = Utils2.extract_classes_n(DataSets_T);
 
         // policzenie srednich dla kazdej z klas
@@ -42,15 +41,14 @@ public class SequentialFS {
         List<Integer> s_features = new ArrayList<>();
 
         // kazda iteracja: wybor kolejnej ceshy
-        for (int ki = 0; ki < select_k; ki++) {
+        for (int ni = 0; ni < select_n; ni++) {
 
             // obliczenia fishera dla kazdego "towarzysza"
             double[] ki_fishers = new double[featuresLen];
             for (int fi = 0; fi < featuresLen; fi++) {
 
-                // pomijane obliczenia dla "samego siebie", cech juz wybranych i cech pomijanych
-                if (fi == ki || s_features.contains(fi)
-                        || Utils2.contains(skipFeatures, fi)) {
+                // pomijane obliczenia dla "samego siebie", cech juz wybranych
+                if (fi == ni || s_features.contains(fi)) {
                     ki_fishers[fi] = Double.MIN_VALUE;
                     continue;
                 }

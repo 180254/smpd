@@ -219,10 +219,10 @@ public class Utils2 {
      * Dzieli zbior na klasy.
      * wynik =  double[][][] -> [class_id][sample][feature]
      */
-    public static double[][][] extract_classes_t(double[][] DataSet_T, int[] DataSetLabels_T, String[] ClassNames) {
-        double[][][] DataSets_T = new double[ClassNames.length][][];
+    public static double[][][] extract_classes_t(double[][] DataSet_T, int[] DataSetLabels_T, int ClassLength) {
+        double[][][] DataSets_T = new double[ClassLength][][];
 
-        for (int i = 0; i < ClassNames.length; i++) {
+        for (int i = 0; i < ClassLength; i++) {
             int[] indexes = Utils2.args_for_value(DataSetLabels_T, i);
             DataSets_T[i] = Utils2.extract_rows(DataSet_T, indexes);
         }
@@ -345,28 +345,5 @@ public class Utils2 {
         }
 
         return false;
-    }
-
-    /**
-     * Znajduje cechy, których wariancja w ramach klasy jest zerowa.
-     * Taka cecha nie może być użyta w czasie selekcji,
-     * gdyż macierz kowariancji obliczona z jej użyciem ma wyznacznik zerowy.
-     */
-    public static int[] bad_features(double[][] DataSet_T, int[] DataSetLabels_T, String[] ClassNames) {
-        double[][][] DataSets_T = extract_classes_t(DataSet_T, DataSetLabels_T, ClassNames);
-        double[][][] DataSets_N = extract_classes_n(DataSets_T);
-
-        List<Integer> badFeatures = new ArrayList<>();
-        for (double[][] dataset_ni : DataSets_N) { // data index
-            for (int fi = 0; fi < dataset_ni.length; fi++) { // feature index
-                if (Matrix3.equals(Math2.variance(DataSets_N[0][fi]), 0, 1e-20)// wariancja jest 0
-                        && !badFeatures.contains(fi)) {  // cecha jeszcze nie zanotowana
-
-                    badFeatures.add(fi);
-                }
-            }
-        }
-
-        return Utils2.to_int_array(badFeatures);
     }
 }

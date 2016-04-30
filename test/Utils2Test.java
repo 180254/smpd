@@ -455,7 +455,7 @@ public class Utils2Test {
                 {3, 1, 3},
         };
         int[] DataSetLabels_T = {0, 1, 2, 1};
-        String[] ClassNames = {"a", "b", "c"};
+        int ClassLength = 3;
 
         double[][][] expected = {
                 {
@@ -469,7 +469,7 @@ public class Utils2Test {
                         {-1, 0.1, 0}
                 }
         };
-        double[][][] result = Utils2.extract_classes_t(DataSet_T, DataSetLabels_T, ClassNames);
+        double[][][] result = Utils2.extract_classes_t(DataSet_T, DataSetLabels_T, ClassLength);
         Assert.assertEquals(expected.length, result.length);
         Assert.assertTrue(Matrix3.equals(expected[0], result[0], 1e-10));
         Assert.assertTrue(Matrix3.equals(expected[1], result[1], 1e-10));
@@ -483,9 +483,9 @@ public class Utils2Test {
                 {5, 3, 2}
         };
         int[] DataSetLabels_T = {0, 1};
-        String[] ClassNames = {"a", "b", "c"};
+        int ClassLength = 3;
 
-        Utils2.extract_classes_t(DataSet_T, DataSetLabels_T, ClassNames);
+        Utils2.extract_classes_t(DataSet_T, DataSetLabels_T, ClassLength);
     }
 
     @Test
@@ -784,54 +784,6 @@ public class Utils2Test {
 
         boolean result = Utils2.contains_any(array, values);
         Assert.assertEquals(false, result);
-    }
-
-    @Test
-    public void bad_features_test_true1() {
-        double[][] DataSet_T = {
-                {5, 1, 1, 3},
-                {5, 6, 1, 8},
-                {5, 2, 1, 8},
-                {9, 9, 9, 9}
-        };
-        int[] DataSetLabels_T = {0, 0, 0, 1};
-        String[] ClassNames = {"a", "b"};
-        int[] expected = {0, 2};
-
-        int[] result = Utils2.bad_features(DataSet_T, DataSetLabels_T, ClassNames);
-        Assert.assertArrayEquals(expected, result);
-    }
-
-    @Test
-    public void bad_features_test_false1() {
-        double[][] DataSet_T = {
-                {5, 1, 1, 3},
-                {5, 6, 1, 8},
-                {5, 2, 1, 8},
-                {9, 9, 9, 9}
-        };
-        int[] DataSetLabels_T = {1, 0, 0, 0};
-        String[] ClassNames = {"a", "b"};
-        int[] expected = {};
-
-        int[] result = Utils2.bad_features(DataSet_T, DataSetLabels_T, ClassNames);
-        Assert.assertArrayEquals(expected, result);
-    }
-
-    @Test
-    public void bad_features_test_false2() {
-        double[][] DataSet_T = {
-                {5, 1, 1, 3},
-                {5, 0, 1, 8},
-                {5, 0, 0, 7},
-                {5.0001, 7, -1, 9}
-        };
-        int[] DataSetLabels_T = {1, 0, 0, 0};
-        String[] ClassNames = {"a", "b"};
-        int[] expected = {};
-
-        int[] result = Utils2.bad_features(DataSet_T, DataSetLabels_T, ClassNames);
-        Assert.assertArrayEquals(expected, result);
     }
 }
 

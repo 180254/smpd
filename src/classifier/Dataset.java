@@ -6,6 +6,7 @@ import utils.Utils2;
 public class Dataset {
 
     public String[] ClassNames;
+    public int ClassLength;
 
     public double[][] TrainingSet_N, TestSet_N;
     public double[][] TrainingSet_T, TestSet_T;
@@ -14,26 +15,38 @@ public class Dataset {
     public double[][][] TrainingSets_N; // [class_id][feature][sample]
     double[][][] TrainingSets_T; // [class_id][sample][feature]
 
+    int DataSet_T_Length;
+    int TrainingSet_T_Length;
+    int TestSet_T_Length;
+    int Features_V_Length;
+
     public Dataset() {
     }
 
-    public boolean splitted() {
+    public boolean hasData() {
         return ClassNames != null;
     }
 
-    public void generate(double[][] Dataset_N, int[] DataSetLabels_T, double TrainSetSize, String[] classNames) {
-        generateTrainingAndTestSets(Dataset_N, DataSetLabels_T, TrainSetSize, classNames);
+    /**
+     * 1. Dzieli zbiory na treningowy i testowy.
+     * 2. Wydziela te zbiory dla konkretnych klas.
+     *
+     * @param Dataset_N       kompletny zbiór próbek
+     * @param DataSetLabels_T indeksy klas do których należą kolejne próbki
+     * @param TrainSetSize    procentowy udział zbioru treningowego
+     * @param ClassNames      nazwy klas, których przekazany został zbiór próbek
+     */
+    public void generate(double[][] Dataset_N, int[] DataSetLabels_T, double TrainSetSize, String[] ClassNames) {
+        generateTrainingAndTestSets(Dataset_N, DataSetLabels_T, TrainSetSize, ClassNames);
         generatePerClassTrainingSets();
     }
 
     private void generateTrainingAndTestSets(
-            double[][] Dataset_N, int[] DataSetLabels_T, double TrainSetSize, String[] classNames) {
-        this.ClassNames = classNames;
+            double[][] Dataset_N, int[] DataSetLabels_T, double TrainSetSize, String[] ClassNames) {
+        this.ClassNames = ClassNames;
+        this.ClassLength = ClassNames.length;
 
         double[][] Dataset_T = Matrix2.transpose(Dataset_N);
-        // Dataset_N.length = liczba cech
-        // Dataset_T.length = liczba probek
-
         int[] Index = new int[Dataset_T.length];
         double Th = TrainSetSize / 100.0;
 
@@ -50,6 +63,7 @@ public class Dataset {
                 TestCount++;
             }
         }
+
         TrainingSet_T = new double[TrainCount][Dataset_N.length];
         TestSet_T = new double[TestCount][Dataset_N.length];
 
@@ -76,15 +90,19 @@ public class Dataset {
         TrainingSet_N = Matrix2.transpose(TrainingSet_T);
         TestSet_N = Matrix2.transpose(TestSet_T);
 
-        System.out.printf("TrainingSet_T.length = %d (%.0f%%)%n",
-                TrainingSet_T.length,
-                TrainingSet_T.length / (double) Dataset_T.length * 100);
-        System.out.println("TestSet_T.length = " + TestSet_T.length);
-        System.out.println("Features_V.length = " + TrainingSet_N.length);
+        DataSet_T_Length = Dataset_T.length;
+        TrainingSet_T_Length = TrainingSet_T.length;
+        TestSet_T_Length = TestSet_T.length;
+        Features_V_Length = TrainingSet_N.length;
+
+        double trainingSetPercent = TrainingSet_T_Length / (double) DataSet_T_Length * 100;
+        System.out.printf("TrainingSet_T.length = %d (%.0f%%)%n", TrainingSet_T_Length, trainingSetPercent);
+        System.out.println("TestSet_T.length = " + TestSet_T_Length);
+        System.out.println("Features_V.length = " + Features_V_Length);
     }
 
     private void generatePerClassTrainingSets() {
-        TrainingSets_T = Utils2.extract_classes_t(TrainingSet_T, TrainingLabels_T, ClassNames);
+        TrainingSets_T = Utils2.extract_classes_t(TrainingSet_T, TrainingLabels_T, ClassLength);
         TrainingSets_N = Utils2.extract_classes_n(TrainingSets_T);
     }
 }
