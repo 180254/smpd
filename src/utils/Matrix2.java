@@ -1,8 +1,7 @@
 package utils;
 
 import Jama.Matrix;
-import pr.InvertException;
-import pr.KnownException;
+import exception.InverseException;
 
 /**
  * Podstawowe operacje na macierzach.
@@ -42,6 +41,10 @@ public class Matrix2 {
 
     /**
      * Odwracanie macierzy.
+     * 1. Najpierw podejmowana jest próba klasycznego odwrócenia.
+     * 2. Jeżeli się nie uda podejmowana jest próba pseuda odwrócenia Moore–Penrose.
+     * 3. W przypadku sukcesu dodatkowo sprawdzane jest, czy w wyniku nie ma wartości Double.NaN/InF
+     * 4. W przypadku nieudanego odwracania rzuca wyjątek: InverseException
      */
     public static double[][] inverse(double[][] matrix) {
         double[][] result;
@@ -50,14 +53,14 @@ public class Matrix2 {
             result = new Matrix(matrix).inverse().getArray();
         } catch (RuntimeException ex) {
             if (ex.getMessage() != null && ex.getMessage().contains("singular")) {
-                result = PseudoInv.pinv(new Matrix(matrix)).getArray();
+                result = PseudoInv.pinv(new Matrix(matrix)).getArray(); // możliwy InverseException
             } else {
                 throw ex;
             }
         }
 
         if (!Double.isFinite(result[0][0])) {
-            throw new InvertException("after inverse NaN value! overflow!?");
+            throw new InverseException("after inverse NaN/Inf value! overflow!?");
         }
 
         return result;

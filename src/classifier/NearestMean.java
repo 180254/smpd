@@ -2,7 +2,7 @@ package classifier;
 
 import classifier.enums.ClassifType;
 import classifier.enums.DistanceType;
-import pr.InvertException;
+import exception.InverseException;
 import utils.Math2;
 import utils.Matrix2;
 import utils.Matrix3;
@@ -61,6 +61,11 @@ public class NearestMean implements Classifier {
             List<List<double[][]>> K_Mod_CovariancesInv = new ArrayList<>(); // [k_id][mod_id][cov_inv,cov_inv]
             List<List<List<Integer>>> K_Mod_TrainingIndexes_T = new ArrayList<>(); // [k_id][mod_id] list<indexes>
             List<Double> K_Mean_Errors = new ArrayList<>(); // [k_id][mean_error]
+
+            // mozliwe powtorzenia obliczen srodkow modow
+            // ponowne proby sa podejmowane w przypadku, gdy macierz kowariancji okaze sie nieodwracalna
+            int retries = 0;
+            final int MAX_RETRY = 5;
 
             // dla kazdego sprawdzanego k
             all_k_loop:
@@ -138,8 +143,13 @@ public class NearestMean implements Classifier {
 
                         try {
                             Mod_CovariancesInv.add(mod_i, Matrix2.inverse(Math2.covariance(modi_dataset_n)));
-                        } catch (InvertException ex) {
-                            break all_k_loop;
+                        } catch (InverseException ex) {
+                            if (++retries <= MAX_RETRY) {
+                                cur_k--;
+                                continue all_k_loop;
+                            } else {
+                                break all_k_loop;
+                            }
                         }
                     }
                 }
@@ -147,21 +157,23 @@ public class NearestMean implements Classifier {
                 // sredni popelniony blad
                 double meanError = Mod_Errors.stream().mapToDouble(d -> d).average().orElse(0);
                 // System.out.println(String.format("%.15f", meanError).replace(".", ","));
-                    System.out.println(String.format("c=%d // k=%2d // %.15f // %s",
-                            classId,
-                            cur_k,
-                            meanError,
-                            Mod_TrainingIndexes_T.stream()
-                                    .map(List::size).map(String::valueOf)
-                                    .reduce((s, s2) -> String.format("%3s, %3s", s, s2))
-                                    .orElse("")
-                    ));
+                System.out.println(String.format("c=%d // k=%2d // %.15f // %s",
+                        classId,
+                        cur_k,
+                        meanError,
+                        Mod_TrainingIndexes_T.stream()
+                                .map(List::size).map(String::valueOf)
+                                .reduce((s, s2) -> String.format("%3s, %3s", s, s2))
+                                .orElse("")
+                ));
 
                 // zapisanie wyniku dla danego k
                 K_Mod_Means_N.add(Mod_Means_N);
                 K_Mod_CovariancesInv.add(Mod_CovariancesInv);
                 K_Mod_TrainingIndexes_T.add(Mod_TrainingIndexes_T);
                 K_Mean_Errors.add(meanError);
+
+                retries = 0;
             } // end: kazde k
 
             // policzenie najlepszego k
@@ -192,6 +204,9 @@ public class NearestMean implements Classifier {
 
     @Override
     public double testClassifier() {
+        // klasyfikator jeszcze nie wytrenowany
+        if (Class_Mod_TrainingSetsMeans_N == null) return -1;
+
         int ok = 0;
 
         for (int i = 0; i < ds.TestSet_T_Length; i++) {

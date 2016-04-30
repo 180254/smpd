@@ -314,11 +314,10 @@ public class Math2 {
         final double INFLECTION_PERCENT = 70;
 
         double maxV = max(points_y);
-        double minV = min(points_y);
-        double total_diff = maxV - minV;
+        double total_diff = maxV - min(points_y);
 
         for (int i = 0; i < points_y.length; i++) {
-            double current_diff = maxV - points_y[i];
+            double current_diff = points_y[0] - points_y[i];
 
             double percent = current_diff / total_diff * 100;
             if (percent >= INFLECTION_PERCENT)

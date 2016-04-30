@@ -1,7 +1,10 @@
 package pr;
 
 import Jama.Matrix;
-import classifier.*;
+import classifier.Classifier;
+import classifier.Dataset;
+import classifier.NearestMean;
+import classifier.NearestNeighbour;
 import classifier.enums.ClassifType;
 import classifier.enums.DistanceType;
 import classifier.enums.KdtUse;
@@ -135,39 +138,39 @@ public class PR_GUI extends javax.swing.JFrame {
         javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
         jPanel2.setLayout(jPanel2Layout);
         jPanel2Layout.setHorizontalGroup(
-            jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel2Layout.createSequentialGroup()
-                .addContainerGap()
-                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(jPanel2Layout.createSequentialGroup()
-                        .addComponent(l_dataset_name_l)
-                        .addGap(18, 18, 18)
-                        .addComponent(l_dataset_name))
-                    .addComponent(jLabel1))
-                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(jPanel2Layout.createSequentialGroup()
-                        .addGap(115, 115, 115)
-                        .addComponent(jLabel3))
-                    .addGroup(jPanel2Layout.createSequentialGroup()
-                        .addGap(94, 94, 94)
-                        .addComponent(jLabel4)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(l_nfeatures)))
-                .addGap(100, 100, 100))
+                jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel2Layout.createSequentialGroup()
+                                .addContainerGap()
+                                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                        .addGroup(jPanel2Layout.createSequentialGroup()
+                                                .addComponent(l_dataset_name_l)
+                                                .addGap(18, 18, 18)
+                                                .addComponent(l_dataset_name))
+                                        .addComponent(jLabel1))
+                                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                        .addGroup(jPanel2Layout.createSequentialGroup()
+                                                .addGap(115, 115, 115)
+                                                .addComponent(jLabel3))
+                                        .addGroup(jPanel2Layout.createSequentialGroup()
+                                                .addGap(94, 94, 94)
+                                                .addComponent(jLabel4)
+                                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                                .addComponent(l_nfeatures)))
+                                .addGap(100, 100, 100))
         );
         jPanel2Layout.setVerticalGroup(
-            jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel2Layout.createSequentialGroup()
-                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jLabel1)
-                    .addComponent(jLabel3))
-                .addGap(10, 10, 10)
-                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(l_dataset_name_l)
-                    .addComponent(jLabel4)
-                    .addComponent(l_dataset_name)
-                    .addComponent(l_nfeatures))
-                .addContainerGap(24, Short.MAX_VALUE))
+                jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addGroup(jPanel2Layout.createSequentialGroup()
+                                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                                        .addComponent(jLabel1)
+                                        .addComponent(jLabel3))
+                                .addGap(10, 10, 10)
+                                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                                        .addComponent(l_dataset_name_l)
+                                        .addComponent(jLabel4)
+                                        .addComponent(l_dataset_name)
+                                        .addComponent(l_nfeatures))
+                                .addContainerGap(24, Short.MAX_VALUE))
         );
 
         getContentPane().add(jPanel2);
@@ -262,12 +265,12 @@ public class PR_GUI extends javax.swing.JFrame {
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
         jPanel1Layout.setHorizontalGroup(
-            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 156, Short.MAX_VALUE)
+                jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addGap(0, 156, Short.MAX_VALUE)
         );
         jPanel1Layout.setVerticalGroup(
-            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 126, Short.MAX_VALUE)
+                jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addGap(0, 126, Short.MAX_VALUE)
         );
 
         getContentPane().add(jPanel1);
@@ -424,7 +427,7 @@ public class PR_GUI extends javax.swing.JFrame {
                 TimeStart = System.currentTimeMillis();
 
                 int newFeatureCount = Integer.parseInt((String) selbox_nfeat.getSelectedItem());
-                int[] features = SequentialFS.get_features(DataSet_N, ClassLabels, ClassNames, newFeatureCount);
+                int[] features = SequentialFS.get_features(DataSet_N, ClassLabels, ClassNames.length, newFeatureCount);
                 System.out.println("SFS = " + Arrays.toString(features));
 
                 TimeStop = System.currentTimeMillis();
@@ -490,6 +493,7 @@ public class PR_GUI extends javax.swing.JFrame {
             case 5:
                 classifier = new NearestMean(ds, DistanceType.Mahalanobis, ClassifType.One);
                 System.out.println("Ustawiono NearestMean Mahalanobis");
+                break;
             case 6:
                 classifier = new NearestMean(ds, DistanceType.Euclidean, ClassifType.K);
                 System.out.println("Ustawiono K-NearestMean Euclidean");
@@ -522,11 +526,11 @@ public class PR_GUI extends javax.swing.JFrame {
     }
 
 
-    private void steActionPerformed(java.awt.event.ActionEvent evt) {                                    
+    private void steActionPerformed(java.awt.event.ActionEvent evt) {
         b_SplitActionPerformed(null);
         b_TrainActionPerformed(null);
         b_ExecuteActionPerformed(null);
-    }                                    
+    }
 
 
     /**
@@ -695,7 +699,7 @@ public class PR_GUI extends javax.swing.JFrame {
         } else {
             // 208316: liczenie fishera
             TimeStart = System.currentTimeMillis();
-            int[] features = FisherDiscriminant.get_features(DataSet_N, ClassLabels, ClassNames, d);
+            int[] features = FisherDiscriminant.get_features(DataSet_N, ClassLabels, ClassNames.length, d);
             System.out.println("Fisher = " + Arrays.toString(features));
             System.arraycopy(features, 0, flags, 0, features.length);
             TimeStop = System.currentTimeMillis();

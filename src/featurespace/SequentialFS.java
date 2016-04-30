@@ -11,29 +11,27 @@ public class SequentialFS {
 
     /**
      * Wybiera najlepsze cechy na podstawie wspolczynnikow fishera.
-     * Do przyspieszenia obliczen wykorzystany algorytm SFS.
+     * Sprawdzane sa wszystkie kombinacje k-cech.
      *
      * @param DataSet_N       Zbior danych treningowych.
      * @param DataSetLabels_T Etykiety, do ktorej klasy naleza kolejne probki.
-     * @param ClassNames      Nazwy kolejnych klas. Indeksem tablicy sa etykiety z DataSetLabels_T.
+     * @param ClassLength     Ile jest klas (możliwych etykiet)
      * @param select_n        Ile cech nalezy wybrac.
      * @return Tablica cech, ktore sa najlepsze do liniowej dyskryminacji.
      */
-    public static int[] get_features(double[][] DataSet_N, int[] DataSetLabels_T, String[] ClassNames, int select_n) {
-        if (ClassNames.length != 2) {
+    public static int[] get_features(double[][] DataSet_N, int[] DataSetLabels_T, int ClassLength, int select_n) {
+        if (ClassLength != 2) {
             throw new RuntimeException();
         }
 
-        int featuresLen = DataSet_N.length;
-
         // podzial na klasy
         double[][] DataSet_T = Matrix2.transpose(DataSet_N);
-        double[][][] DataSets_T = Utils2.extract_classes_t(DataSet_T, DataSetLabels_T, ClassNames.length);
+        double[][][] DataSets_T = Utils2.extract_classes_t(DataSet_T, DataSetLabels_T, ClassLength);
         double[][][] DataSets_N = Utils2.extract_classes_n(DataSets_T);
 
         // policzenie srednich dla kazdej z klas
         double[][][] DataSetMeans_N = new double[DataSets_N.length][][];
-        for (int i = 0; i < ClassNames.length; i++) {
+        for (int i = 0; i < ClassLength; i++) {
             DataSetMeans_N[i] = Math2.means_n(DataSets_N[i]);
         }
 
@@ -44,8 +42,8 @@ public class SequentialFS {
         for (int ni = 0; ni < select_n; ni++) {
 
             // obliczenia fishera dla kazdego "towarzysza"
-            double[] ki_fishers = new double[featuresLen];
-            for (int fi = 0; fi < featuresLen; fi++) {
+            double[] ki_fishers = new double[DataSet_N.length];
+            for (int fi = 0; fi < DataSet_N.length; fi++) {
 
                 // pomijane obliczenia dla "samego siebie", cech juz wybranych
                 if (fi == ni || s_features.contains(fi)) {

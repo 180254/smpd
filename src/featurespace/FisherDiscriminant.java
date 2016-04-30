@@ -18,12 +18,12 @@ public class FisherDiscriminant {
      *
      * @param DataSet_N       Zbior danych treningowych.
      * @param DataSetLabels_T Etykiety, do ktorej klasy naleza kolejne probki.
-     * @param ClassNames      Nazwy kolejnych klas. Indeksem tablicy sa etykiety z DataSetLabels_T.
+     * @param ClassLength     Ile jest klas (możliwych etykiet)
      * @param select_n        Ile cech nalezy wybrac.
      * @return Tablica cech, ktore sa najlepsze do liniowej dyskryminacji.
      */
-    public static int[] get_features(double[][] DataSet_N, int[] DataSetLabels_T, String[] ClassNames, int select_n) {
-        if (ClassNames.length != 2) {
+    public static int[] get_features(double[][] DataSet_N, int[] DataSetLabels_T, int ClassLength, int select_n) {
+        if (ClassLength != 2) {
             throw new RuntimeException();
         }
         ExecutorService executor = Executors.newFixedThreadPool(
@@ -32,12 +32,12 @@ public class FisherDiscriminant {
 
         // podzial na klasy
         double[][] DataSet_T = Matrix2.transpose(DataSet_N);
-        double[][][] DataSets_T = Utils2.extract_classes_t(DataSet_T, DataSetLabels_T, ClassNames.length);
+        double[][][] DataSets_T = Utils2.extract_classes_t(DataSet_T, DataSetLabels_T, ClassLength);
         double[][][] DataSets_N = Utils2.extract_classes_n(DataSets_T);
 
         // policzenie srednich dla kazdej z klas
         double[][][] DataSetMeans_N = new double[DataSets_N.length][][];
-        for (int i = 0; i < ClassNames.length; i++) {
+        for (int i = 0; i < ClassLength; i++) {
             DataSetMeans_N[i] = Math2.means_n(DataSets_N[i]);
         }
 
