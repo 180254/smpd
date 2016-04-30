@@ -53,7 +53,7 @@ public class KdtNode {
     }
 
     public int Depth() {
-        int i = 0;
+        int i = 1;
         KdtNode kdt = this;
         while (kdt.left != null) {
             kdt = kdt.left;
@@ -74,9 +74,7 @@ public class KdtNode {
         return KdtTree(DataSet_To, 0);
     }
 
-    private static KdtNode KdtTree(
-            double[][] DataSet_T,
-            int depth) {
+    private static KdtNode KdtTree(double[][] DataSet_T, int depth) {
 
         if (DataSet_T.length <= LEAF_IND_LENGTH) {
             // ostatnia kolumna to kolumna porządkowa (do sortowania)
@@ -127,7 +125,8 @@ public class KdtNode {
     public int[] FindNeighbours(double[] sample_v, int k) {
         KdtNode kdt = this;
 
-        while (kdt.indLength / 2 >= k && !kdt.isLeaf()) { // dopóki liczba próbek jest zbyt duża (wystarczy jedno dziecko)
+        // dopóki liczba próbek jest zbyt duża (wystarczy jedno dziecko)
+        while (kdt.indLength / 2 >= k && !kdt.isLeaf()) {
             // porównujemy cechy, na podstawie której był podział i wskazujemy, czy będziemy szukać po lewej, czy prawej
             kdt = sample_v[kdt.axis] <= kdt.median_v[kdt.axis]
                     ? kdt.left

@@ -188,14 +188,14 @@ public class Math2 {
 
         double[][] result1 = Matrix2.multiply(x_minus_means_t, k_covarianceInv);
         double[][] result2 = Matrix2.multiply(result1, x_minus_means_n);
-
-        if (Matrix3.equals(result2[0][0], 0, 1e-20)) {
-            result2[0][0] = 0;
-        }
-
-        if (result2[0][0] < 0 || !Double.isFinite(result2[0][0])) {
-            throw new KnownException("distance<0 or NaN! overflow!?");
-        }
+//
+//        if (Matrix3.equals(result2[0][0], 0, 1e-20)) {
+//            result2[0][0] = 0;
+//        }
+//
+//        if (result2[0][0] < 0 || !Double.isFinite(result2[0][0])) {
+//            throw new KnownException("distance<0 or NaN! overflow!?");
+//        }
         return result2[0][0];
     }
 
@@ -203,11 +203,11 @@ public class Math2 {
      * TODO: opisać
      */
     public static double distance_mahalanobis2(double[][] point_n, double[][] k_means_n, double[][] k_covarianceInv) {
-        try {
-            return Math2.distance_mahalanobis(point_n, k_means_n, k_covarianceInv);
-        } catch (KnownException ex) {
-            return Double.MAX_VALUE;
-        }
+//        try {
+        return Math2.distance_mahalanobis(point_n, k_means_n, k_covarianceInv);
+//        } catch (KnownException ex) {
+//            return Double.MAX_VALUE;
+//        }
     }
 
     /**
@@ -322,10 +322,10 @@ public class Math2 {
      * Punkt "przegięcia" funkcji, miejsce gdzie sie normuje. Uzyteczne dla wykresu k od bledu.
      * Za punkt ten uznaje takie K, dla ktorego osiagane jest 70% całkowitego spadku wartości bledu.
      * Wartości x są domyślne - od 1 do points_y.length-1
-     * Zwracana jest wartość x (wartosc k)! _nie_ indeks.
+     * Zwracana jest indeks z points_y.
      */
     public static int inflection_point(double[] points_y) {
-        if (points_y.length == 1) return 1;
+        if (points_y.length == 1) return 0;
 
         final double INFLECTION_PERCENT = 70;
         double total_diff = points_y[0] - points_y[points_y.length - 1];
@@ -335,7 +335,7 @@ public class Math2 {
 
             double percent = current_diff / total_diff * 100;
             if (percent >= INFLECTION_PERCENT)
-                return i + 1;
+                return i;
         }
 
         throw new RuntimeException();

@@ -1,5 +1,5 @@
 package classifier.enums;
 
-public enum ClassType {
+public enum ClassifType {
     One, K
 }

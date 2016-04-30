@@ -2,6 +2,7 @@ package utils;
 
 import Jama.Matrix;
 import Jama.SingularValueDecomposition;
+import pr.InvertException;
 
 /**
  * Credits: Ahmed Abdelkader @ the-lost-beauty.blogspot.com
@@ -47,7 +48,7 @@ public class PseudoInv {
 
         SingularValueDecomposition svdX = new SingularValueDecomposition(x);
         if (svdX.rank() < 1) {
-            throw new RuntimeException("unable to pseudo invert; svdX.rank() = " + svdX.rank());
+            throw new InvertException("unable to pseudo invert; svdX.rank() = " + svdX.rank());
         }
 
         double[] singularValues = svdX.getSingularValues();

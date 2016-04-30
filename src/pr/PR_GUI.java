@@ -2,7 +2,7 @@ package pr;
 
 import Jama.Matrix;
 import classifier.*;
-import classifier.enums.ClassType;
+import classifier.enums.ClassifType;
 import classifier.enums.DistanceType;
 import classifier.enums.KdtUse;
 import featurespace.FisherDiscriminant;
@@ -468,34 +468,34 @@ public class PR_GUI extends javax.swing.JFrame {
 
         switch (jComboBox2.getSelectedIndex()) {
             case 0:
-                classifier = new NearestNeighbour(ds, ClassType.One, KdtUse.False);
+                classifier = new NearestNeighbour(ds, ClassifType.One, KdtUse.False);
                 System.out.println("Ustawiono NearestNeighbour Euclidean");
                 break;
             case 1:
-                classifier = new NearestNeighbour(ds, ClassType.One, KdtUse.True);
+                classifier = new NearestNeighbour(ds, ClassifType.One, KdtUse.True);
                 System.out.println("Ustawiono NearestNeighbour Euclidean K-Dim-Tree");
                 break;
             case 2:
-                classifier = new NearestNeighbour(ds, ClassType.K, KdtUse.False);
+                classifier = new NearestNeighbour(ds, ClassifType.K, KdtUse.False);
                 System.out.println("Ustawiono K-NearestNeighbour Euclidean");
                 break;
             case 3:
-                classifier = new NearestNeighbour(ds, ClassType.K, KdtUse.True);
+                classifier = new NearestNeighbour(ds, ClassifType.K, KdtUse.True);
                 System.out.println("Ustawiono K-NearestNeighbour Euclidean K-Dim-Tree");
                 break;
             case 4:
-                classifier = new NearestMean(ds, DistanceType.Euclidean, ClassType.One);
+                classifier = new NearestMean(ds, DistanceType.Euclidean, ClassifType.One);
                 System.out.println("Ustawiono NearestMean Euclidean");
                 break;
             case 5:
-                classifier = new NearestMean(ds, DistanceType.Mahalanobis, ClassType.One);
+                classifier = new NearestMean(ds, DistanceType.Mahalanobis, ClassifType.One);
                 System.out.println("Ustawiono NearestMean Mahalanobis");
             case 6:
-                classifier = new NearestMean(ds, DistanceType.Euclidean, ClassType.K);
+                classifier = new NearestMean(ds, DistanceType.Euclidean, ClassifType.K);
                 System.out.println("Ustawiono K-NearestMean Euclidean");
                 break;
             case 7:
-                classifier = new NearestMean(ds, DistanceType.Mahalanobis, ClassType.K);
+                classifier = new NearestMean(ds, DistanceType.Mahalanobis, ClassifType.K);
                 System.out.println("Ustawiono K-NearestMean Mahalanobis");
                 break;
         }

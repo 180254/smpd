@@ -55,9 +55,9 @@ public class Matrix2 {
             }
         }
 
-        if (!Double.isFinite(result[0][0])) {
-            throw new KnownException("after inverse NaN value! overflow!?");
-        }
+//        if (!Double.isFinite(result[0][0])) {
+//            throw new KnownException("after inverse NaN value! overflow!?");
+//        }
 
         return result;
     }

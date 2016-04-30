@@ -1,8 +1,8 @@
 package classifier;
 
-import classifier.enums.ClassType;
+import classifier.enums.ClassifType;
 import classifier.enums.DistanceType;
-import pr.KnownException;
+import pr.InvertException;
 import utils.Math2;
 import utils.Matrix2;
 import utils.Matrix3;
@@ -15,136 +15,139 @@ public class NearestMean implements Classifier {
 
     private Dataset ds;
     private DistanceType distanceType;
-    private ClassType classType;
+    private ClassifType classifType;
 
-    List<List<double[][]>> TrainingSetsMeans_N; // [class_id][mod_id][feature_mean][1]
-    List<List<double[][]>> TrainingSetsCovarianceInv; // [class_id][mod_id][cov_inv,cov_inv]
+    List<List<double[][]>> Class_Mod_TrainingSetsMeans_N; // [class_id][mod_id][feature_mean][1]
+    List<List<double[][]>> Class_Mod_TrainingSetsCovarianceInv; // [class_id][mod_id][cov_inv,cov_inv]
 
-    final int MAX_RETRY = 10;
     final int K_MIN = 1;
     final int K_MAX = 10;
 
-    public NearestMean(Dataset ds, DistanceType distanceType, ClassType classType) {
+    public NearestMean(Dataset ds, DistanceType distanceType, ClassifType classifType) {
         this.ds = ds;
         this.distanceType = distanceType;
-        this.classType = classType;
+        this.classifType = classifType;
     }
 
     @Override
     public void trainClassifier() {
-        TrainingSetsMeans_N = new ArrayList<>();
-        TrainingSetsCovarianceInv = new ArrayList<>();
+        Class_Mod_TrainingSetsMeans_N = new ArrayList<>();
+        Class_Mod_TrainingSetsCovarianceInv = new ArrayList<>();
 
         // dla każdej klasy
         // each_class:
-        for (int classId = 0; classId < ds.TrainingSets_N.length; classId++) {
+        for (int classId = 0; classId < ds.ClassLength; classId++) {
 
             // w przypadku NN (bez k) zakladamy, ze klasa ma jeden mod
             // srednia i kowariancja jest liczona dla calej klasy
-            if (classType == ClassType.One) {
+            if (classifType == ClassifType.One) {
 
                 double[][] means_n = Math2.means_n(ds.TrainingSets_N[classId]);
-                TrainingSetsMeans_N.add(new ArrayList<>());
-                TrainingSetsMeans_N.get(classId).add(means_n);
+                Class_Mod_TrainingSetsMeans_N.add(new ArrayList<>());
+                Class_Mod_TrainingSetsMeans_N.get(classId);
+                Class_Mod_TrainingSetsMeans_N.get(classId).add(means_n);
 
                 double[][] covariance = Math2.covariance(ds.TrainingSets_N[classId]);
                 double[][] covarianceInv = Matrix2.inverse(covariance);
-                TrainingSetsCovarianceInv.add(new ArrayList<>());
-                TrainingSetsCovarianceInv.get(classId).add(covarianceInv);
+                Class_Mod_TrainingSetsCovarianceInv.add(new ArrayList<>());
+                Class_Mod_TrainingSetsCovarianceInv.get(classId).add(covarianceInv);
 
                 continue; // each_class; pomijamy kolejne kroki kierowane do k-NN
             }
 
-            // classType = ClassType = K; pelna procedura
+            // classifType = ClassifType.K; pelna procedura
             // zmienne przechowujace wyliczone wartosci dla kazdego z k
             List<List<double[][]>> K_Mod_Means_N = new ArrayList<>(); // [k_id][mod_id][feature_mean,1]
             List<List<double[][]>> K_Mod_CovariancesInv = new ArrayList<>(); // [k_id][mod_id][cov_inv,cov_inv]
             List<List<List<Integer>>> K_Mod_TrainingIndexes_T = new ArrayList<>(); // [k_id][mod_id] list<indexes>
             List<Double> K_Mean_Errors = new ArrayList<>(); // [k_id][mean_error]
 
-            int retries = 0;
             // dla kazdego sprawdzanego k
+            all_k_loop:
             for (int cur_k = K_MIN; cur_k <= K_MAX; cur_k++) {
+                // srednie; macierze kowariancji dla kazdego skupistka
+                // lista indeksow dla kazdego skupistka; popelnione bledy
+                List<double[][]> Mod_Means_N = new ArrayList<>(); // [mod_id][feature_mean,1]
+                List<double[][]> Mod_CovariancesInv = new ArrayList<>(); // [mod_id][cov_inv,cov_inv]
+                List<List<Integer>> Mod_TrainingIndexes_T = new ArrayList<>(); // [mod_id] list<indexes>
+                List<Double> Mod_Errors = new ArrayList<>(); // list <errors>
 
-                try {
-                    // srednie; macierze kowariancji dla kazdego skupistka
-                    // lista indeksow dla kazdego skupistka; popelnione bledy
-                    List<double[][]> Mod_Means_N = new ArrayList<>();
-                    List<double[][]> Mod_CovariancesInv = new ArrayList<>();
-                    List<List<Integer>> Mod_TrainingIndexes_T = new ArrayList<>();
-                    List<Double> Mod_Errors = new ArrayList<>();
+                // wstepnie wylosowana srednia dla kazdego skupiska;
+                for (int mod_i = 0; mod_i < cur_k; mod_i++) {
+                    Mod_Means_N.add(Utils2.random_mean_n2(ds.TrainingSets_N[classId]));
+                }
 
-                    // wstepnie wylosowana srednia dla kazdego skupiska;
+                // iteracyjne poprawianie sredniej; policzenie wartosci dla modu
+                boolean doNextIteration;
+                do {
+                    Mod_TrainingIndexes_T.clear();
                     for (int ki = 0; ki < cur_k; ki++) {
-                        Mod_Means_N.add(Utils2.random_mean_n(ds.TrainingSets_N[classId]));
+                        Mod_TrainingIndexes_T.add(new ArrayList<>());
+                    }
+                    Mod_Errors.clear();
+
+                    // klasyfikowanie kazdej probki i policzenie bledu
+                    for (int ti = 0; ti < ds.TrainingSets_T[classId].length; ti++) {
+                        double[] sample_v = ds.TrainingSets_T[classId][ti];
+
+                        double[] distances_v = new double[cur_k];
+                        for (int mod_i = 0; mod_i < cur_k; mod_i++) {
+                            double[] mean_v = Matrix2.to_vector_n(Mod_Means_N.get(mod_i));
+                            distances_v[mod_i] = Math2.distance_euclidean(sample_v, mean_v);
+                        }
+
+                        int bestMod = Math2.arg_min(distances_v);
+                        Mod_TrainingIndexes_T.get(bestMod).add(ti);
+                        Mod_Errors.add(distances_v[bestMod]);
                     }
 
-                    // iteracyjne poprawianie sredniej
-                    boolean doNextIteration;
-                    do {
-                        Mod_TrainingIndexes_T.clear();
-                        for (int ki = 0; ki < cur_k; ki++) {
-                            Mod_TrainingIndexes_T.add(new ArrayList<>());
-                        }
-                        Mod_Errors.clear();
+                    // pobliczenie nowej sredniej i jej korekta
+                    List<double[][]> prev_Mod_Means_N = new ArrayList<>(Mod_Means_N);
+                    for (int mod_i = 0; mod_i < cur_k; mod_i++) {
+                        if (Mod_TrainingIndexes_T.get(mod_i).size() == 0)
+                            continue;
 
-                        // klasyfikowanie kazdej probki i policzenie bledu
-                        for (int ti = 0; ti < ds.TrainingSets_T[classId].length; ti++) {
-                            double[] sample_v = ds.TrainingSets_T[classId][ti];
-                            double[] distances_v = new double[cur_k];
-
-                            for (int ki = 0; ki < cur_k; ki++) {
-                                double[] mean_v = Matrix2.to_vector_n(Mod_Means_N.get(ki));
-                                distances_v[ki] = Math2.distance_euclidean(sample_v, mean_v);
-                            }
-
-                            int bestMod = Math2.arg_min(distances_v);
-                            Mod_TrainingIndexes_T.get(bestMod).add(ti);
-                            Mod_Errors.add(distances_v[bestMod]);
-                        }
-
-                        // pobliczenie nowej sredniej i jej korekta
-                        List<double[][]> prev_Mod_Means_N = new ArrayList<>(Mod_Means_N);
-                        for (int ki = 0; ki < cur_k; ki++) {
-                            if (Mod_TrainingIndexes_T.get(ki).size() == 0)
-                                continue;
-
-                            int[] trainingIndexes = Utils2.to_int_array(Mod_TrainingIndexes_T.get(ki));
-                            double[][] ki_dataset_t = Utils2.extract_rows(ds.TrainingSets_T[classId], trainingIndexes);
-                            double[][] ki_dataset_n = Matrix2.transpose(ki_dataset_t);
-                            Mod_Means_N.set(ki, Math2.means_n(ki_dataset_n));
-                        }
-
-                        // sprawdzenie, czy zaszla jakas korekta srednich
-                        doNextIteration = false;
-                        for (int ki = 0; ki < cur_k; ki++) {
-                            final double epsilon = 1e-10;
-                            if (!Matrix3.equals(prev_Mod_Means_N.get(ki), Mod_Means_N.get(ki), epsilon)) {
-                                doNextIteration = true;
-                                break;
-                            }
-                        }
-                    } while (doNextIteration);
-
-                    // policzenie kowariancji, tu moze sie okazac, ze macierz jest nieodwracalna
-                    if (distanceType == DistanceType.Mahalanobis) {
-                        for (int ki = 0; ki < cur_k; ki++) {
-                            if (Mod_TrainingIndexes_T.get(ki).size() == 0) {
-                                Mod_CovariancesInv.add(ki, null);
-                                continue;
-                            }
-                            int[] trainingIndexes = Utils2.to_int_array(Mod_TrainingIndexes_T.get(ki));
-                            double[][] ki_dataset_t = Utils2.extract_rows(ds.TrainingSets_T[classId], trainingIndexes);
-                            double[][] ki_dataset_n = Matrix2.transpose(ki_dataset_t);
-
-                            Mod_CovariancesInv.add(ki, Matrix2.inverse(Math2.covariance(ki_dataset_n)));
-                        }
+                        int[] trainingIndexes = Utils2.to_int_array(Mod_TrainingIndexes_T.get(mod_i));
+                        double[][] modi_dataset_t = Utils2.extract_rows(ds.TrainingSets_T[classId], trainingIndexes);
+                        double[][] modi_dataset_n = Matrix2.transpose(modi_dataset_t);
+                        Mod_Means_N.set(mod_i, Math2.means_n(modi_dataset_n));
                     }
 
-                    // sredni popelniony blad
-                    double meanError = Mod_Errors.stream().mapToDouble(d -> d).average().orElse(0);
-                    // System.out.println(String.format("%.15f", meanError).replace(".", ","));
-                    /* System.out.println(String.format("c=%d // k=%2d // %.15f // %s",
+                    // sprawdzenie, czy zaszla jakas korekta srednich
+                    doNextIteration = false;
+                    for (int mod_i = 0; mod_i < cur_k; mod_i++) {
+                        final double epsilon = 1e-20;
+                        if (!Matrix3.equals(prev_Mod_Means_N.get(mod_i), Mod_Means_N.get(mod_i), epsilon)) {
+                            doNextIteration = true;
+                            break;
+                        }
+                    }
+                } while (doNextIteration); // end: iteracje; srodki modow juz sa znane
+
+                // policzenie kowariancji
+                if (distanceType == DistanceType.Mahalanobis) {
+                    for (int mod_i = 0; mod_i < cur_k; mod_i++) {
+                        if (Mod_TrainingIndexes_T.get(mod_i).size() == 0) {
+                            Mod_CovariancesInv.add(mod_i, null);
+                            continue;
+                        }
+
+                        int[] trainingIndexes = Utils2.to_int_array(Mod_TrainingIndexes_T.get(mod_i));
+                        double[][] modi_dataset_t = Utils2.extract_rows(ds.TrainingSets_T[classId], trainingIndexes);
+                        double[][] modi_dataset_n = Matrix2.transpose(modi_dataset_t);
+
+                        try {
+                            Mod_CovariancesInv.add(mod_i, Matrix2.inverse(Math2.covariance(modi_dataset_n)));
+                        } catch (InvertException ex) {
+                            break all_k_loop;
+                        }
+                    }
+                }
+
+                // sredni popelniony blad
+                double meanError = Mod_Errors.stream().mapToDouble(d -> d).average().orElse(0);
+                // System.out.println(String.format("%.15f", meanError).replace(".", ","));
+                    System.out.println(String.format("c=%d // k=%2d // %.15f // %s",
                             classId,
                             cur_k,
                             meanError,
@@ -152,82 +155,61 @@ public class NearestMean implements Classifier {
                                     .map(List::size).map(String::valueOf)
                                     .reduce((s, s2) -> String.format("%3s, %3s", s, s2))
                                     .orElse("")
-                    )); */
+                    ));
 
-                    // zapisanie wyniku dla danego k
-                    K_Mod_Means_N.add(Mod_Means_N);
-                    K_Mod_CovariancesInv.add(Mod_CovariancesInv);
-                    K_Mod_TrainingIndexes_T.add(Mod_TrainingIndexes_T);
-                    K_Mean_Errors.add(meanError);
-
-                    retries = 0;
-                } catch (KnownException e) {
-                    if (retries++ > MAX_RETRY)
-                        break;
-//                    System.out.printf("k = %d -> repeating mods calculatio (%s)%n", cur_k, e.getMessage());
-                    cur_k--;
-                }
+                // zapisanie wyniku dla danego k
+                K_Mod_Means_N.add(Mod_Means_N);
+                K_Mod_CovariancesInv.add(Mod_CovariancesInv);
+                K_Mod_TrainingIndexes_T.add(Mod_TrainingIndexes_T);
+                K_Mean_Errors.add(meanError);
             } // end: kazde k
 
-            if (K_Mean_Errors.size() == 0) {
-                throw new KnownException("Unable to train due to singulars or overflows");
-            }
-
             // policzenie najlepszego k
-            int bestK = Math2.inflection_point(Utils2.to_dbl_array(K_Mean_Errors));
-            int bestKi = bestK - 1;
+            int bestKi = Math2.inflection_point(Utils2.to_dbl_array(K_Mean_Errors));
+            int bestK = bestKi + K_MIN;
 
-            // policzenie efektywnego K
-            int[] empty_mod = Utils2.empty_lists_ids(K_Mod_TrainingIndexes_T.get(bestKi));
-            for (int empty : empty_mod) {
-                K_Mod_Means_N.get(bestKi).remove(empty);
+            // policzenie efektywnego K, byc moze jakies mody sa puste?
+            int[] emptyModsId = Utils2.empty_lists_ids(K_Mod_TrainingIndexes_T.get(bestKi));
+            for (int emptyModId : emptyModsId) {
+                K_Mod_Means_N.get(bestKi).remove(emptyModId);
+
                 if (distanceType == DistanceType.Mahalanobis) {
-                    K_Mod_CovariancesInv.get(bestKi).remove(empty);
+                    K_Mod_CovariancesInv.get(bestKi).remove(emptyModId);
                 }
             }
 
             int efectiveK = K_Mod_Means_N.get(bestKi).size();
-            System.out.printf("c=%d, k=%d, efektywneK = %d%n", classId, bestK, efectiveK);
+            System.out.printf("c=%d, min(k) = %d, max(k) = %d, k=%d, efektywneK = %d%n",
+                    classId, K_MIN, K_Mod_Means_N.size(), bestK, efectiveK);
 
             // zapisanie srednich i kowariancji dla klasy - najlepsze ustalone K
-            TrainingSetsMeans_N.add(K_Mod_Means_N.get(bestKi));
-            TrainingSetsCovarianceInv.add(K_Mod_CovariancesInv.get(bestKi));
+            Class_Mod_TrainingSetsMeans_N.add(K_Mod_Means_N.get(bestKi));
+            Class_Mod_TrainingSetsCovarianceInv.add(K_Mod_CovariancesInv.get(bestKi));
 
 //            System.out.println("-----------------------------------------------");
         } // end: kazda klasa
     }
 
-
     @Override
     public double testClassifier() {
         int ok = 0;
-        int maxOk = ds.TestSet_T.length;
 
-        for (int i = 0; i < ds.TestSet_T.length; i++) {
-
-            try {
-                int classLabel = nearestMean(ds.TestSet_T[i]);
-                int properLabel = ds.TestLabels_T[i];
-                if (properLabel == classLabel) ok++;
-
-            } catch (KnownException ex) {
-                maxOk--;
-
-            }
+        for (int i = 0; i < ds.TestSet_T_Length; i++) {
+            int classLabel = nearestMeanLabel(ds.TestSet_T[i]);
+            int properLabel = ds.TestLabels_T[i];
+            if (properLabel == classLabel) ok++;
         }
 
-        System.out.printf("Straconych próbek testowych: %d/%d%n", ds.TestSet_T.length - maxOk, ds.TestSet_T.length);
-        return ok / (double) maxOk;
+        return ok / (double) ds.TestSet_T_Length;
     }
 
     /**
      * wynik = indeks wskazujacy do ktorej klasy (label) jest najblizej
      */
-    private int nearestMean(double[] features_v) {
-        int classLength = ds.ClassNames.length;
-        double[] distances = new double[classLength];
+    private int nearestMeanLabel(double[] features_v) {
+        double[] distances = new double[ds.ClassLength];
 
-        for (int cur_class = 0; cur_class < classLength; cur_class++) {
+        for (int cur_class = 0; cur_class < ds.ClassLength; cur_class++) {
             distances[cur_class] = distanceToClass(cur_class, features_v);
         }
 
@@ -239,20 +221,20 @@ public class NearestMean implements Classifier {
      * liczona jest odległośc do każdego modu i wybierana najmniejsza
      */
     private double distanceToClass(int classId, double[] features_v) {
-        int modLength = TrainingSetsMeans_N.get(classId).size();
+        int modLength = Class_Mod_TrainingSetsMeans_N.get(classId).size();
         double[] distances = new double[modLength];
 
         for (int cur_mod = 0; cur_mod < modLength; cur_mod++) {
 
             if (distanceType == DistanceType.Euclidean) {
-                double[][] means_n = TrainingSetsMeans_N.get(classId).get(cur_mod);
+                double[][] means_n = Class_Mod_TrainingSetsMeans_N.get(classId).get(cur_mod);
                 double[] mean_v = Matrix2.to_vector_n(means_n);
                 distances[cur_mod] = Math2.distance_euclidean(features_v, mean_v);
 
             } else if (distanceType == DistanceType.Mahalanobis) {
                 double[][] point_n = Matrix2.to_matrix_n(features_v);
-                double[][] means_n = TrainingSetsMeans_N.get(classId).get(cur_mod);
-                double[][] covarianceInv = TrainingSetsCovarianceInv.get(classId).get(cur_mod);
+                double[][] means_n = Class_Mod_TrainingSetsMeans_N.get(classId).get(cur_mod);
+                double[][] covarianceInv = Class_Mod_TrainingSetsCovarianceInv.get(classId).get(cur_mod);
                 distances[cur_mod] = Math2.distance_mahalanobis2(point_n, means_n, covarianceInv);
             }
         }
