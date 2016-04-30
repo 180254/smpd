@@ -24,10 +24,6 @@ public class PseudoInvTest {
         Matrix A = new Matrix(mat);
         Matrix Aplus = PseudoInv.pinv(A);
 
-        if (Aplus == null) {
-            return;
-        }
-
         Assert.assertTrue(checkEquality(A.times(Aplus).times(A), A));
         Assert.assertTrue(checkEquality(Aplus.times(A).times(Aplus), Aplus));
         Assert.assertTrue(checkEquality(A.times(Aplus), A.times(Aplus).transpose()));
