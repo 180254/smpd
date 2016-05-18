@@ -477,79 +477,85 @@ public class PR_GUI extends javax.swing.JFrame {
 
         // TRENING
         // 208316, odpowiedni nauczyciel w zaleznosci od tego co zostalo wybrane
-        System.out.println("----------------------------------------------------");
-
-        switch (jComboBox2.getSelectedIndex()) {
-            case 0:
-                classifier = new NearestNeighbour(ds, ClassifType.One, KdtUse.False);
-                System.out.println("Ustawiono NearestNeighbour Euclidean");
-                break;
-            case 1:
-                classifier = new NearestNeighbour(ds, ClassifType.One, KdtUse.True);
-                System.out.println("Ustawiono NearestNeighbour Euclidean K-Dim-Tree");
-                break;
-            case 2:
-                classifier = new NearestNeighbour(ds, ClassifType.K, KdtUse.False);
-                System.out.println("Ustawiono K-NearestNeighbour Euclidean");
-                break;
-            case 3:
-                classifier = new NearestNeighbour(ds, ClassifType.K, KdtUse.True);
-                System.out.println("Ustawiono K-NearestNeighbour Euclidean K-Dim-Tree");
-                break;
-            case 4:
-                classifier = new NearestMean(ds, DistanceType.Euclidean, ClassifType.One);
-                System.out.println("Ustawiono NearestMean Euclidean");
-                break;
-            case 5:
-                classifier = new NearestMean(ds, DistanceType.Mahalanobis, ClassifType.One);
-                System.out.println("Ustawiono NearestMean Mahalanobis");
-                break;
-            case 6:
-                classifier = new NearestMean(ds, DistanceType.Euclidean, ClassifType.K);
-                System.out.println("Ustawiono K-NearestMean Euclidean");
-                break;
-            case 7:
-                classifier = new NearestMean(ds, DistanceType.Mahalanobis, ClassifType.K);
-                System.out.println("Ustawiono K-NearestMean Mahalanobis");
-                break;
-        }
+//        System.out.println("----------------------------------------------------");
 
         classifier.trainClassifier();
         TimeStop = System.currentTimeMillis();
-        System.out.println(String.format("Trening zakonczono. %.3fs", (TimeStop - TimeStart) / 1000.0));
+//        System.out.println(String.format("Trening zakonczono. %.3fs", (TimeStop - TimeStart) / 1000.0));
 
         // EXECUTE
-        System.out.println("----------------------------------------------------");
+//        System.out.println("----------------------------------------------------");
         TimeStart = System.currentTimeMillis();
         double test = classifier.testClassifier();
         TimeStop = System.currentTimeMillis();
 
         tests.add(test);
-        System.out.println(String.format("Skutecznosc: %.4f / czas: %.3fs", test, (TimeStop - TimeStart) / 1000.0));
+//        System.out.println(String.format("Skutecznosc: %.4f / czas: %.3fs", test, (TimeStop - TimeStart) / 1000.0));
     }
 
     private void teActionPerformed(ActionEvent evt) {
-        tests.clear();
-        long TimeStart2, TimeStop2;
+        checkClassifierFromComboBox(true, true);
 
+        long TimeStart2, TimeStop2;
         TimeStart2 = System.currentTimeMillis();
 
+        tests.clear();
         ds.reset();
         while (ds.nextData()) {
-            System.out.println("XXXXXXXXXXXXXXXXXXXXX");
             b_TrainActionPerformed(null);
             b_ExecuteActionPerformed(null);
         }
 
         TimeStop2 = System.currentTimeMillis();
-        double average = tests.stream().mapToDouble(d -> d).summaryStatistics().getAverage();
-        System.out.println(String.format("Srednia skutecznosc: %.4f / czas: %.3fs", average, (TimeStop2 - TimeStart2) / 1000.0));
-    }
 
+        System.out.print("^^^");
+        checkClassifierFromComboBox(false, true);
+
+        System.out.println(String.format("^^^Srednia skutecznosc: %.4f / sumatyczny czas: %.3fs",
+                tests.stream().mapToDouble(d -> d).summaryStatistics().getAverage(),
+                (TimeStop2 - TimeStart2) / 1000.0));
+    }
 
     private void steActionPerformed(java.awt.event.ActionEvent evt) {
         b_SplitActionPerformed(null);
         teActionPerformed(null);
+    }
+
+    private void checkClassifierFromComboBox(boolean set, boolean print) {
+        switch (jComboBox2.getSelectedIndex()) {
+            case 0:
+                if (set) classifier = new NearestNeighbour(ds, ClassifType.One, KdtUse.False);
+                if (print) System.out.println("Ustawiono NearestNeighbour Euclidean");
+                break;
+            case 1:
+                if (set) classifier = new NearestNeighbour(ds, ClassifType.One, KdtUse.True);
+                if (print) System.out.println("Ustawiono NearestNeighbour Euclidean K-Dim-Tree");
+                break;
+            case 2:
+                if (set) classifier = new NearestNeighbour(ds, ClassifType.K, KdtUse.False);
+                if (print) System.out.println("Ustawiono K-NearestNeighbour Euclidean");
+                break;
+            case 3:
+                if (set) classifier = new NearestNeighbour(ds, ClassifType.K, KdtUse.True);
+                if (print) System.out.println("Ustawiono K-NearestNeighbour Euclidean K-Dim-Tree");
+                break;
+            case 4:
+                if (set) classifier = new NearestMean(ds, DistanceType.Euclidean, ClassifType.One);
+                if (print) System.out.println("Ustawiono NearestMean Euclidean");
+                break;
+            case 5:
+                if (set) classifier = new NearestMean(ds, DistanceType.Mahalanobis, ClassifType.One);
+                if (print) System.out.println("Ustawiono NearestMean Mahalanobis");
+                break;
+            case 6:
+                if (set) classifier = new NearestMean(ds, DistanceType.Euclidean, ClassifType.K);
+                if (print) System.out.println("Ustawiono K-NearestMean Euclidean");
+                break;
+            case 7:
+                if (set) classifier = new NearestMean(ds, DistanceType.Mahalanobis, ClassifType.K);
+                if (print) System.out.println("Ustawiono K-NearestMean Mahalanobis");
+                break;
+        }
     }
 
 
