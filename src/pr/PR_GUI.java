@@ -9,6 +9,8 @@ import classifier.enums.DistanceType;
 import classifier.enums.KdtUse;
 import classifier.sets.Dataset;
 import classifier.sets.DatasetBootstrap;
+import classifier.sets.DatasetCross;
+import classifier.sets.DatasetSimple;
 import featurespace.FisherDiscriminant;
 import featurespace.SequentialFS;
 import utils.Utils2;
@@ -106,6 +108,7 @@ public class PR_GUI extends javax.swing.JFrame {
         jButton1 = new javax.swing.JButton();
         jButton3 = new javax.swing.JButton();
         jButton5 = new javax.swing.JButton();
+        jComboBox1 = new javax.swing.JComboBox<>();
         jPanel5 = new javax.swing.JPanel();
         jLabel2 = new javax.swing.JLabel();
         l_FLD_winner = new javax.swing.JLabel();
@@ -302,7 +305,7 @@ public class PR_GUI extends javax.swing.JFrame {
                         "k-NM-moh"
                 }));
         jPanel4.add(jComboBox2);
-        jComboBox2.setBounds(74, 41, 152, 20);
+        jComboBox2.setBounds(80, 30, 152, 20);
 
         b_Train.setText("Train");
         b_Train.addActionListener(this::b_TrainActionPerformed);
@@ -341,9 +344,15 @@ public class PR_GUI extends javax.swing.JFrame {
         jButton3.setBounds(150, 80, 170, 40);
 
         jButton5.setText("Train & Execute");
-        jButton5.addActionListener(evt -> teActionPerformed(evt));
+        jButton5.addActionListener(this::teActionPerformed);
         jPanel4.add(jButton5);
         jButton5.setBounds(150, 120, 170, 40);
+
+        jComboBox1.setModel(new javax.swing.DefaultComboBoxModel<>(new String[]{"Simple", "Bootstrap", "Crossvalidation"}));
+        jComboBox1.setMinimumSize(new java.awt.Dimension(152, 20));
+        jComboBox1.setPreferredSize(new java.awt.Dimension(152, 20));
+        jPanel4.add(jComboBox1);
+        jComboBox1.setBounds(80, 50, 152, 20);
 
         getContentPane().add(jPanel4);
         jPanel4.setBounds(340, 150, 350, 210);
@@ -463,7 +472,7 @@ public class PR_GUI extends javax.swing.JFrame {
     private void b_SplitActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_b_SplitActionPerformed
         if (DataSetNew_N == null) return; // no reduced feature space have been derived
         System.out.println("----------------------------------------------------");
-        ds = new DatasetBootstrap(DataSetNew_N, ClassLabels, Double.parseDouble(tf_TrainSetSize.getText()), ClassNames);
+        checkDatasetFromComboBox(true, true);
         ds.split();
     }//GEN-LAST:event_b_SplitActionPerformed
 
@@ -490,7 +499,8 @@ public class PR_GUI extends javax.swing.JFrame {
         TimeStop = System.currentTimeMillis();
 
         tests.add(test);
-//        System.out.println(String.format("Skutecznosc: %.4f / czas: %.3fs", test, (TimeStop - TimeStart) / 1000.0));
+        System.out.println(String.format("Skutecznosc: %.4f / czas: %.3fs", test, (TimeStop - TimeStart) / 1000.0));
+        System.out.print("/");
     }
 
     private void teActionPerformed(ActionEvent evt) {
@@ -511,6 +521,8 @@ public class PR_GUI extends javax.swing.JFrame {
 
         System.out.print("^^^");
         checkClassifierFromComboBox(false, true);
+        System.out.print("^^^");
+        checkDatasetFromComboBox(false, true);
 
         System.out.println(String.format("^^^Srednia skutecznosc: %.4f / sumatyczny czas: %.3fs",
                 tests.stream().mapToDouble(d -> d).summaryStatistics().getAverage(),
@@ -561,6 +573,28 @@ public class PR_GUI extends javax.swing.JFrame {
         }
     }
 
+    private void checkDatasetFromComboBox(boolean set, boolean print) {
+        // 208316, odpowiedni nauczyciel w zaleznosci od tego co zostalo wybrane
+
+        switch (jComboBox1.getSelectedIndex()) {
+            case 0:
+                if (set)
+                    ds = new DatasetSimple(DataSetNew_N, ClassLabels, Double.parseDouble(tf_TrainSetSize.getText()), ClassNames);
+                if (print) System.out.println("Ustawiono " + ds.getClass().getSimpleName());
+                break;
+            case 1:
+                if (set)
+                    ds = new DatasetBootstrap(DataSetNew_N, ClassLabels, Double.parseDouble(tf_TrainSetSize.getText()), ClassNames);
+
+                if (print) System.out.println("Ustawiono " + ds.getClass().getSimpleName());
+                break;
+            case 2:
+                if (set)
+                    ds = new DatasetCross(DataSetNew_N, ClassLabels, Double.parseDouble(tf_TrainSetSize.getText()), ClassNames);
+                if (print) System.out.println("Ustawiono " + ds.getClass().getSimpleName());
+                break;
+        }
+    }
 
     /**
      * @param args the command line arguments
@@ -582,6 +616,7 @@ public class PR_GUI extends javax.swing.JFrame {
     private javax.swing.JButton jButton3;
     private javax.swing.JButton jButton4;
     private javax.swing.JButton jButton5;
+    private javax.swing.JComboBox<String> jComboBox1;
     private javax.swing.JComboBox jComboBox2;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel10;
