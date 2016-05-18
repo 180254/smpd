@@ -423,7 +423,7 @@ public class PR_GUI extends javax.swing.JFrame {
     private void b_deriveFSActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_b_deriveFSActionPerformed
         // derive optimal feature space
         if (DataSet_N == null) return;
-        System.out.println("----------------------------------------------------");
+        System.out.println("------FEATURES----------------------------------------------");
 
         if (f_rb_sel.isSelected()) { // selection
 
@@ -471,7 +471,7 @@ public class PR_GUI extends javax.swing.JFrame {
 
     private void b_SplitActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_b_SplitActionPerformed
         if (DataSetNew_N == null) return; // no reduced feature space have been derived
-        System.out.println("----------------------------------------------------");
+        System.out.println("------SPLIT-------------------------------------------------");
         checkDatasetFromComboBox(true, true);
         ds.split();
     }//GEN-LAST:event_b_SplitActionPerformed
@@ -500,11 +500,12 @@ public class PR_GUI extends javax.swing.JFrame {
 
         tests.add(test);
         System.out.println(String.format("Skutecznosc: %.4f / czas: %.3fs", test, (TimeStop - TimeStart) / 1000.0));
-        System.out.print("/");
     }
 
     private void teActionPerformed(ActionEvent evt) {
         if (ds == null) return;
+        System.out.println("------T&E---------------------------------------------------");
+
         checkClassifierFromComboBox(true, true);
 
         long TimeStart2, TimeStop2;
@@ -512,19 +513,22 @@ public class PR_GUI extends javax.swing.JFrame {
 
         tests.clear();
         ds.reset();
+
+        System.out.println("------IT-->");
         while (ds.nextData()) {
             b_TrainActionPerformed(null);
             b_ExecuteActionPerformed(null);
+            System.out.println("------IT-->");
         }
 
         TimeStop2 = System.currentTimeMillis();
 
-        System.out.print("^^^");
+        System.out.print("------");
         checkClassifierFromComboBox(false, true);
-        System.out.print("^^^");
+        System.out.print("------");
         checkDatasetFromComboBox(false, true);
 
-        System.out.println(String.format("^^^Srednia skutecznosc: %.4f / sumatyczny czas: %.3fs",
+        System.out.println(String.format("------Srednia skutecznosc: %.4f / sumaryczny czas: %.3fs",
                 tests.stream().mapToDouble(d -> d).summaryStatistics().getAverage(),
                 (TimeStop2 - TimeStart2) / 1000.0));
     }

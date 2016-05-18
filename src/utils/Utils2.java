@@ -346,4 +346,22 @@ public class Utils2 {
 
         return false;
     }
+
+    /**
+     * "shuffle" dla tablicy.
+     * Przetasowuje tablicę, tak by kolejność była losowa.
+     * Jest to algorytm Fisher–Yates shuffle i tasowanie odbywa się w miejscu.
+     *
+     * @param array tablica do przetasowania
+     */
+    public static int[] shuffleArray(int[] array) {
+        for (int i = array.length - 1; i > 0; i--) {
+            int index = random.nextInt(i + 1);
+            int a = array[index];
+            array[index] = array[i];
+            array[i] = a;
+        }
+
+        return array;
+    }
 }

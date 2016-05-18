@@ -4,14 +4,11 @@ package classifier.sets;
 import utils.Matrix2;
 import utils.Utils2;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Random;
+import java.util.*;
 
 public class DatasetBootstrap extends Dataset {
 
-    public static int NUMBER_OF_INTERATIONS = 30;
+    public static int NUMBER_OF_INTERATIONS = 10;
     private int iterationIndex = -1;
 
     /*
@@ -47,6 +44,8 @@ public class DatasetBootstrap extends Dataset {
     @Override
     public void split() {
         Random rnd = new Random();
+
+        samplesNo.clear();
         for (int k = 0; k < NUMBER_OF_INTERATIONS; k++) {
             samplesNo.add(new ArrayList<>());
 
@@ -61,13 +60,10 @@ public class DatasetBootstrap extends Dataset {
         iterationIndex++;
         if (iterationIndex >= NUMBER_OF_INTERATIONS) return false;
 
-        Features_V_Length = o_Dataset_N.length;
-        TrainingSet_T_Length = DataSet_T_Length;
-
         // wypełnienie TrainingSet_T danymi, metoda bootstrap
-        TrainingSet_T = new double[DataSet_T_Length][Features_V_Length];
-        TrainingLabels_T = new int[DataSet_T_Length];
-
+        TrainingSet_T_Length = DataSet_T_Length;
+        TrainingSet_T = new double[TrainingSet_T_Length][Features_V_Length];
+        TrainingLabels_T = new int[TrainingSet_T_Length];
 
         for (int i = 0; i < TrainingSet_T_Length; i++) {
             int sampleNo = samplesNo.get(iterationIndex).get(i);
@@ -75,15 +71,16 @@ public class DatasetBootstrap extends Dataset {
             TrainingLabels_T[i] = o_DataSetLabels_T[sampleNo];
         }
 
-        HashSet<Object> uniqueSamplesNo = new HashSet<>();
+        Set<Object> uniqueSamplesNo = new HashSet<>();
         uniqueSamplesNo.addAll(samplesNo.get(iterationIndex));
 
         // wypełnienie TestSet_T danymi, metoda bootstrap
         TestSet_T_Length = DataSet_T_Length - uniqueSamplesNo.size();
         TestSet_T = new double[TestSet_T_Length][Features_V_Length];
-        TestLabels_T = new int[DataSet_T_Length];
+        TestLabels_T = new int[TestSet_T_Length];
 
         int testIndex = 0;
+        //noinspection Duplicates
         for (int i = 0; i < DataSet_T_Length; i++) {
             if (!samplesNo.get(iterationIndex).contains(i)) {
                 TestSet_T[testIndex] = o_Dataset_T[i];
@@ -99,10 +96,7 @@ public class DatasetBootstrap extends Dataset {
         TrainingSets_T = Utils2.extract_classes_t(TrainingSet_T, TrainingLabels_T, ClassLength);
         TrainingSets_N = Utils2.extract_classes_n(TrainingSets_T);
 
-        System.out.printf("TrainingSet_T.length = %d (%.0f%%)%n", TrainingSet_T_Length, 100.0);
-        System.out.println("TestSet_T.length = " + TestSet_T_Length);
-        System.out.println("Features_V.length = " + Features_V_Length);
-
+        printInfo();
         return true;
     }
 

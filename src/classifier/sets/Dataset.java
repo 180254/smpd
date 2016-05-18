@@ -36,6 +36,7 @@ public abstract class Dataset {
 
         o_Dataset_T = Matrix2.transpose(o_Dataset_N);
         DataSet_T_Length = o_Dataset_T.length;
+        Features_V_Length = o_Dataset_N.length;
     }
 
     /**
@@ -44,16 +45,31 @@ public abstract class Dataset {
     public abstract void split();
 
     /**
-     * while(nextData() {...}
-     * Dataset może zawierać więcej niż jeden zbiór danych na któwych należy dokonać obliczeń.
+     * while(nextData()) {...}
+     * Dataset może zawierać więcej niż jeden zbiór danych na którym należy dokonać obliczeń.
      * nextData() ustawia zmienne na kolejny zbiór danych.
+     * Zwraca informację, czy przestawienie zostało dokonane.
+     * jeżeli return = false koniec iteracji.
      */
     public abstract boolean nextData();
 
     /**
      * Resetuje "iterator", tak by znów było można wykonać:
-     * while(nextData() {...}
+     * while(nextData()) {...}
      */
     public abstract void reset();
 
+
+    /**
+     * Wypisuje informacje o aktualnym stanie danych.
+     */
+    public void printInfo() {
+        double trainingSetPercent = TrainingSet_T_Length / (double) DataSet_T_Length * 100;
+        System.out.printf("TrainingSet_T.length = %d (%.0f%%)%n", TrainingSet_T_Length, trainingSetPercent);
+
+        double testSetPercent = TestSet_T_Length / (double) DataSet_T_Length * 100;
+        System.out.printf("TestSet_T.length = %d (%.0f%%)%n", TestSet_T_Length, testSetPercent);
+
+        System.out.println("Features_V.length = " + Features_V_Length);
+    }
 }

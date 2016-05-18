@@ -4,6 +4,10 @@ import utils.Matrix2;
 import utils.Utils2;
 
 public class DatasetSimple extends Dataset {
+
+    int iterationIndex = -1;
+
+
     /*
     public String[] ClassNames;
     public int ClassLength;
@@ -21,12 +25,12 @@ public class DatasetSimple extends Dataset {
     public int Features_V_Length;
 
     protected double[][] o_Dataset_N;
+    protected double[][] o_Dataset_T;
     protected int[] o_DataSetLabels_T;
     protected double o_TrainSetSize;
     protected String[] o_ClassNames;
     */
 
-    int iteratorIndex = -1;
 
     public DatasetSimple(double[][] o_Dataset_N, int[] o_DataSetLabels_T, double o_TrainSetSize, String[] o_ClassNames) {
         super(o_Dataset_N, o_DataSetLabels_T, o_TrainSetSize, o_ClassNames);
@@ -34,6 +38,12 @@ public class DatasetSimple extends Dataset {
 
     @Override
     public void split() {
+        /**
+         * Prosty podział, gdzie o_TrainSetSize procent próbek będzie w zbiorze treningowym.
+         * Z uwagi na zastosowany algorytm o_TrainSetSize jest przybliżeniem.
+         * Uzyskany procent będzie bardzo zbliżony do oczekiwanego, ale nie idealny.
+         */
+
         double[][] Dataset_T = Matrix2.transpose(o_Dataset_N);
         int[] Index = new int[Dataset_T.length];
         double Th = o_TrainSetSize / 100.0;
@@ -81,25 +91,25 @@ public class DatasetSimple extends Dataset {
         DataSet_T_Length = Dataset_T.length;
         TrainingSet_T_Length = TrainingSet_T.length;
         TestSet_T_Length = TestSet_T.length;
-        Features_V_Length = TrainingSet_N.length;
 
         TrainingSets_T = Utils2.extract_classes_t(TrainingSet_T, TrainingLabels_T, ClassLength);
         TrainingSets_N = Utils2.extract_classes_n(TrainingSets_T);
-
-        double trainingSetPercent = TrainingSet_T_Length / (double) DataSet_T_Length * 100;
-        System.out.printf("TrainingSet_T.length = %d (%.0f%%)%n", TrainingSet_T_Length, trainingSetPercent);
-        System.out.println("TestSet_T.length = " + TestSet_T_Length);
-        System.out.println("Features_V.length = " + Features_V_Length);
     }
 
     @Override
     public boolean nextData() {
-        iteratorIndex++;
-        return iteratorIndex == 0;
+
+        /**
+         * Tylko jedna iteracja. Implementacja nie wspiera n iteracji, tak, by iteracje były powtarzalne.
+         */
+        iterationIndex++;
+        boolean ret = iterationIndex < 1;
+        if (ret) printInfo();
+        return ret;
     }
 
     @Override
     public void reset() {
-        iteratorIndex = -1;
+        iterationIndex = -1;
     }
 }
