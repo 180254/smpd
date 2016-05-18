@@ -473,10 +473,10 @@ public class PR_GUI extends javax.swing.JFrame {
     List<Double> tests = new ArrayList<>();
 
     private void b_ExecuteActionPerformed(java.awt.event.ActionEvent evt) {
+        if (ds == null) return;
         TimeStart = System.currentTimeMillis();
 
         // TRENING
-        // 208316, odpowiedni nauczyciel w zaleznosci od tego co zostalo wybrane
 //        System.out.println("----------------------------------------------------");
 
         classifier.trainClassifier();
@@ -494,6 +494,7 @@ public class PR_GUI extends javax.swing.JFrame {
     }
 
     private void teActionPerformed(ActionEvent evt) {
+        if (ds == null) return;
         checkClassifierFromComboBox(true, true);
 
         long TimeStart2, TimeStop2;
@@ -522,6 +523,8 @@ public class PR_GUI extends javax.swing.JFrame {
     }
 
     private void checkClassifierFromComboBox(boolean set, boolean print) {
+        // 208316, odpowiedni nauczyciel w zaleznosci od tego co zostalo wybrane
+
         switch (jComboBox2.getSelectedIndex()) {
             case 0:
                 if (set) classifier = new NearestNeighbour(ds, ClassifType.One, KdtUse.False);
