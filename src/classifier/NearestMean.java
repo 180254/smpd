@@ -2,6 +2,7 @@ package classifier;
 
 import classifier.enums.ClassifType;
 import classifier.enums.DistanceType;
+import classifier.sets.Dataset;
 import exception.InverseException;
 import utils.Math2;
 import utils.Matrix2;

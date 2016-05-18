@@ -2,12 +2,13 @@ package pr;
 
 import Jama.Matrix;
 import classifier.Classifier;
-import classifier.Dataset;
 import classifier.NearestMean;
 import classifier.NearestNeighbour;
 import classifier.enums.ClassifType;
 import classifier.enums.DistanceType;
 import classifier.enums.KdtUse;
+import classifier.sets.Dataset;
+import classifier.sets.DatasetBootstrap;
 import featurespace.FisherDiscriminant;
 import featurespace.SequentialFS;
 import utils.Utils2;
@@ -307,11 +308,14 @@ public class PR_GUI extends javax.swing.JFrame {
         b_Train.addActionListener(this::b_TrainActionPerformed);
         jPanel4.add(b_Train);
         b_Train.setBounds(40, 110, 100, 23);
+        b_Train.setEnabled(false);
 
         jButton4.setText("Execute");
         jButton4.addActionListener(this::b_ExecuteActionPerformed);
         jPanel4.add(jButton4);
         jButton4.setBounds(40, 130, 100, 23);
+        jButton4.setEnabled(false);
+
 
         jLabel16.setText("Training part:");
         jPanel4.add(jLabel16);
@@ -453,19 +457,25 @@ public class PR_GUI extends javax.swing.JFrame {
         }
     }//GEN-LAST:event_b_deriveFSActionPerformed
 
-    Dataset ds = new Dataset();
+    Dataset ds = null;
     Classifier classifier = null;
 
     private void b_SplitActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_b_SplitActionPerformed
         if (DataSetNew_N == null) return; // no reduced feature space have been derived
         System.out.println("----------------------------------------------------");
-        ds.generate(DataSetNew_N, ClassLabels, Double.parseDouble(tf_TrainSetSize.getText()), ClassNames);
+        ds = new DatasetBootstrap(DataSetNew_N, ClassLabels, Double.parseDouble(tf_TrainSetSize.getText()), ClassNames);
+        ds.split();
     }//GEN-LAST:event_b_SplitActionPerformed
 
     private void b_TrainActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_b_TrainActionPerformed
-        if (!ds.hasData()) return;
+    }//GEN-LAST:event_b_TrainActionPerformed
+
+    List<Double> tests = new ArrayList<>();
+
+    private void b_ExecuteActionPerformed(java.awt.event.ActionEvent evt) {
         TimeStart = System.currentTimeMillis();
 
+        // TRENING
         // 208316, odpowiedni nauczyciel w zaleznosci od tego co zostalo wybrane
         System.out.println("----------------------------------------------------");
 
@@ -508,28 +518,38 @@ public class PR_GUI extends javax.swing.JFrame {
         TimeStop = System.currentTimeMillis();
         System.out.println(String.format("Trening zakonczono. %.3fs", (TimeStop - TimeStart) / 1000.0));
 
-    }//GEN-LAST:event_b_TrainActionPerformed
-
-    private void b_ExecuteActionPerformed(java.awt.event.ActionEvent evt) {
-        if (classifier == null) return;
+        // EXECUTE
         System.out.println("----------------------------------------------------");
         TimeStart = System.currentTimeMillis();
         double test = classifier.testClassifier();
         TimeStop = System.currentTimeMillis();
 
+        tests.add(test);
         System.out.println(String.format("Skutecznosc: %.4f / czas: %.3fs", test, (TimeStop - TimeStart) / 1000.0));
     }
 
     private void teActionPerformed(ActionEvent evt) {
-        b_TrainActionPerformed(null);
-        b_ExecuteActionPerformed(null);
+        tests.clear();
+        long TimeStart2, TimeStop2;
+
+        TimeStart2 = System.currentTimeMillis();
+
+        ds.reset();
+        while (ds.nextData()) {
+            System.out.println("XXXXXXXXXXXXXXXXXXXXX");
+            b_TrainActionPerformed(null);
+            b_ExecuteActionPerformed(null);
+        }
+
+        TimeStop2 = System.currentTimeMillis();
+        double average = tests.stream().mapToDouble(d -> d).summaryStatistics().getAverage();
+        System.out.println(String.format("Srednia skutecznosc: %.4f / czas: %.3fs", average, (TimeStop2 - TimeStart2) / 1000.0));
     }
 
 
     private void steActionPerformed(java.awt.event.ActionEvent evt) {
         b_SplitActionPerformed(null);
-        b_TrainActionPerformed(null);
-        b_ExecuteActionPerformed(null);
+        teActionPerformed(null);
     }
 
 

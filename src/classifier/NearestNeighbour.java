@@ -2,6 +2,7 @@ package classifier;
 
 import classifier.enums.ClassifType;
 import classifier.enums.KdtUse;
+import classifier.sets.Dataset;
 import utils.Math2;
 import utils.Utils2;
 
