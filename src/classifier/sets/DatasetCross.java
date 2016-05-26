@@ -8,7 +8,7 @@ import java.util.List;
 
 public class DatasetCross extends Dataset {
 
-    public static int NUMBER_OF_PARTS = 10;
+    public static int NUMBER_OF_PARTS = 20;
     private int iterationIndex = -1;
 
     /*
@@ -35,6 +35,7 @@ public class DatasetCross extends Dataset {
     */
 
     protected int samplesPerPart = -1; // liczba próbek przypadająca na każdą część
+    protected int numberOfParts = -1;
     protected List<List<Integer>> samplesForPart = new ArrayList<>(); // próbki przypisane do każdej części
 
     public DatasetCross(double[][] o_Dataset_N, int[] o_DataSetLabels_T, double o_TrainSetSize, String[] o_ClassNames) {
@@ -47,8 +48,10 @@ public class DatasetCross extends Dataset {
         int[] samples = Utils2.range_ex(0, DataSet_T_Length);
         int[] shuffledSamples = Utils2.shuffleArray(samples);
 
+        numberOfParts = (int) Math.ceil(DataSet_T_Length * 1.0 / samplesPerPart);
+
         samplesForPart.clear();
-        for (int i = 0; i < NUMBER_OF_PARTS; i++) {
+        for (int i = 0; i < numberOfParts; i++) {
             samplesForPart.add(new ArrayList<>());
         }
 
@@ -64,7 +67,7 @@ public class DatasetCross extends Dataset {
     @Override
     public boolean nextData() {
         iterationIndex++;
-        if (iterationIndex >= NUMBER_OF_PARTS) return false;
+        if (iterationIndex >= numberOfParts) return false;
 
         // do zbioru treningowego wpadaja wszystkie probki poza tymi z części dla aktualnej iteracji
         TrainingSet_T_Length = o_Dataset_T.length - samplesForPart.get(iterationIndex).size();
