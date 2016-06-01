@@ -8,8 +8,7 @@ import java.util.List;
 
 public class DatasetCross extends Dataset {
 
-    public static int NUMBER_OF_PARTS = 5;
-    private int iterationIndex = -1;
+
 
     /*
     public String[] ClassNames;
@@ -34,24 +33,28 @@ public class DatasetCross extends Dataset {
     protected String[] o_ClassNames;
     */
 
+    public int numberOfParts = 5;
+    private int iterationIndex = -1;
+
     protected int samplesPerPart = -1; // liczba próbek przypadająca na każdą część
-    protected int numberOfParts = -1;
+    protected int realNumberOfParts = -1;
     protected List<List<Integer>> samplesForPart = new ArrayList<>(); // próbki przypisane do każdej części
 
     public DatasetCross(double[][] o_Dataset_N, int[] o_DataSetLabels_T, double o_TrainSetSize, String[] o_ClassNames) {
         super(o_Dataset_N, o_DataSetLabels_T, o_TrainSetSize, o_ClassNames);
+        numberOfParts = (int) o_TrainSetSize;
     }
 
     @Override
     public void split() {
-        samplesPerPart = (int) Math.ceil(DataSet_T_Length * 1.0 / NUMBER_OF_PARTS);
+        samplesPerPart = (int) Math.ceil(DataSet_T_Length * 1.0 / numberOfParts);
         int[] samples = Utils2.range_ex(0, DataSet_T_Length);
         int[] shuffledSamples = Utils2.shuffleArray(samples);
 
-        numberOfParts = (int) Math.ceil(DataSet_T_Length * 1.0 / samplesPerPart);
+        realNumberOfParts = (int) Math.ceil(DataSet_T_Length * 1.0 / samplesPerPart);
 
         samplesForPart.clear();
-        for (int i = 0; i < numberOfParts; i++) {
+        for (int i = 0; i < realNumberOfParts; i++) {
             samplesForPart.add(new ArrayList<>());
         }
 
@@ -67,7 +70,7 @@ public class DatasetCross extends Dataset {
     @Override
     public boolean nextData() {
         iterationIndex++;
-        if (iterationIndex >= numberOfParts) return false;
+        if (iterationIndex >= realNumberOfParts) return false;
 
         // do zbioru treningowego wpadaja wszystkie probki poza tymi z części dla aktualnej iteracji
         TrainingSet_T_Length = o_Dataset_T.length - samplesForPart.get(iterationIndex).size();

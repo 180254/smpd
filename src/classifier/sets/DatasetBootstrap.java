@@ -9,8 +9,6 @@ import java.util.*;
 
 public class DatasetBootstrap extends Dataset {
 
-    public static int NUMBER_OF_INTERATIONS = 50;
-    private int iterationIndex = -1;
 
     /*
     public String[] ClassNames;
@@ -35,11 +33,15 @@ public class DatasetBootstrap extends Dataset {
     protected String[] o_ClassNames;
     */
 
+    private int iterationIndex = -1;
+    private int numberOfInterations = 50;
+
     // próbki dla każdej iteracji bootstrap w zbiorze treningowym
     List<List<Integer>> samplesNo = new ArrayList<>();
 
     public DatasetBootstrap(double[][] o_Dataset_N, int[] o_DataSetLabels_T, double o_TrainSetSize, String[] o_ClassNames) {
         super(o_Dataset_N, o_DataSetLabels_T, o_TrainSetSize, o_ClassNames);
+        numberOfInterations = (int) o_TrainSetSize;
     }
 
     @Override
@@ -47,7 +49,7 @@ public class DatasetBootstrap extends Dataset {
         Random rnd = new SecureRandom();
 
         samplesNo.clear();
-        for (int k = 0; k < NUMBER_OF_INTERATIONS; k++) {
+        for (int k = 0; k < numberOfInterations; k++) {
             samplesNo.add(new ArrayList<>());
 
             for (int i = 0; i < DataSet_T_Length; i++) {
@@ -61,7 +63,7 @@ public class DatasetBootstrap extends Dataset {
     @Override
     public boolean nextData() {
         iterationIndex++;
-        if (iterationIndex >= NUMBER_OF_INTERATIONS) return false;
+        if (iterationIndex >= numberOfInterations) return false;
 
         // wypełnienie TrainingSet_T danymi, metoda bootstrap
         TrainingSet_T_Length = DataSet_T_Length;

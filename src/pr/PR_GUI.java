@@ -325,7 +325,7 @@ public class PR_GUI extends javax.swing.JFrame {
         jPanel4.add(tf_TrainSetSize);
         tf_TrainSetSize.setBounds(110, 170, 20, 20);
 
-        jLabel17.setText("%");
+        jLabel17.setText("");
         jPanel4.add(jLabel17);
         jLabel17.setBounds(140, 170, 20, 14);
 
@@ -350,6 +350,7 @@ public class PR_GUI extends javax.swing.JFrame {
         jComboBox1.setPreferredSize(new java.awt.Dimension(152, 20));
         jPanel4.add(jComboBox1);
         jComboBox1.setBounds(80, 50, 152, 20);
+        jComboBox1.addActionListener(e -> datasetChanged());
 
         getContentPane().add(jPanel4);
         jPanel4.setBounds(340, 150, 350, 210);
@@ -378,6 +379,25 @@ public class PR_GUI extends javax.swing.JFrame {
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
+
+    private void datasetChanged() {
+        switch (jComboBox1.getSelectedIndex()) {
+            case 0:
+                jLabel16.setText("Training part:");
+                tf_TrainSetSize.setText("80");
+                break;
+
+            case 1:
+                jLabel16.setText("Iterations:");
+                tf_TrainSetSize.setText("50");
+                break;
+
+            case 2:
+                jLabel16.setText("Num of parts:");
+                tf_TrainSetSize.setText("5");
+                break;
+        }
+    }
 
 
     private void f_rb_selActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_f_rb_selActionPerformed
@@ -416,6 +436,7 @@ public class PR_GUI extends javax.swing.JFrame {
         }
 
     }//GEN-LAST:event_jButton2ActionPerformed
+
 
     private void b_deriveFSActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_b_deriveFSActionPerformed
         // derive optimal feature space
