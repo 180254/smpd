@@ -55,7 +55,13 @@ public class SequentialFS {
                 List<Integer> fi_features = new ArrayList<>(s_features);
                 fi_features.add(fi);
 
-                ki_fishers[fi] = FisherDiscriminant.fisher2(
+                ki_fishers[fi] = ni == 0
+                        ? FisherDiscriminant.fisher1(
+                        DataSets_N[0], DataSets_N[1],
+                        DataSetMeans_N[0], DataSetMeans_N[1],
+                        Utils2.to_int_array(fi_features))
+
+                        : FisherDiscriminant.fisher2(
                         DataSets_N[0], DataSets_N[1],
                         DataSetMeans_N[0], DataSetMeans_N[1],
                         Utils2.to_int_array(fi_features));

@@ -760,7 +760,7 @@ public class PR_GUI extends javax.swing.JFrame {
     private void selectFeatures(int[] flags, int d) {
         // for now: check all individual features using 1D, 2-class Fisher criterion
 
-        if (d == 1) { // 208316: wiecej nie uzywane, za kazdym razem wykorzystana wladna klasa
+        if (d == -1) { // 208316: nie uzywane, moja klasa obejmuje obydwa przypadki
             double FLD = 0, tmp;
             int max_ind = -1;
             for (int i = 0; i < FeatureCount; i++) {
