@@ -1,9 +1,8 @@
 package utils;
 
-import java.util.Collections;
-import java.util.LinkedHashMap;
-import java.util.Map;
-import java.util.TreeSet;
+import org.apache.commons.math3.util.Pair;
+
+import java.util.*;
 import java.util.stream.DoubleStream;
 
 /**
@@ -90,14 +89,19 @@ public class Math2 {
         if (numbers.length < k)
             throw new IllegalArgumentException();
 
-        TreeSet<Integer> topK =
-                new TreeSet<>((o1, o2) -> Double.compare(numbers[o1], numbers[o2]));
-
+        List<Pair<Integer, Double>> pairs = new ArrayList<>();
         for (int i = 0; i < numbers.length; i++) {
-            topK.add(i);
+            pairs.add(new Pair<>(i, numbers[i]));
         }
 
-        return topK.stream().limit(k).mapToInt(i -> i).toArray();
+        pairs.sort((o1, o2) -> Double.compare(o1.getSecond(), o2.getSecond()));
+
+        int[] result = new int[k];
+        for (int i = 0; i < k; i++) {
+            result[i] = pairs.get(i).getFirst();
+        }
+
+        return result;
     }
 
     /**

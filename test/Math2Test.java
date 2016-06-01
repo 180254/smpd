@@ -5,6 +5,7 @@ import utils.Math2;
 import utils.Matrix2;
 import utils.Matrix3;
 
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -114,6 +115,18 @@ public class Math2Test {
         Assert.assertArrayEquals(expected, result);
     }
 
+    @Test
+    public void arg_min_k_test_true4() {
+        //                  0  1  2   3  4
+        double[] numbers = {2, 1, 88, 2, 2};
+        int k = 3;
+        int[] expected = {1, 0, 3};
+
+        int[] result = Math2.arg_min(numbers, k);
+        System.out.println(Arrays.toString(result));
+        Assert.assertArrayEquals(expected, result);
+    }
+
     @Test(expected = RuntimeException.class)
     public void arg_min_k_test_false1() {
         double[] numbers = {};
@@ -161,6 +174,24 @@ public class Math2Test {
     public void most_popular_test_true4() {
         int[] numbers = {4, 3, 3, 4};
         int expected = 4;
+
+        int result = Math2.most_popular(numbers);
+        Assert.assertEquals(expected, result);
+    }
+
+    @Test
+    public void most_popular_test_true5() {
+        int[] numbers = {0, 1, 0};
+        int expected = 0;
+
+        int result = Math2.most_popular(numbers);
+        Assert.assertEquals(expected, result);
+    }
+
+    @Test
+    public void most_popular_test_true6() {
+        int[] numbers = {0, 1, 1};
+        int expected = 1;
 
         int result = Math2.most_popular(numbers);
         Assert.assertEquals(expected, result);
