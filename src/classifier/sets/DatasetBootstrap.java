@@ -4,11 +4,12 @@ package classifier.sets;
 import utils.Matrix2;
 import utils.Utils2;
 
+import java.security.SecureRandom;
 import java.util.*;
 
 public class DatasetBootstrap extends Dataset {
 
-    public static int NUMBER_OF_INTERATIONS = 10;
+    public static int NUMBER_OF_INTERATIONS = 50;
     private int iterationIndex = -1;
 
     /*
@@ -43,7 +44,7 @@ public class DatasetBootstrap extends Dataset {
 
     @Override
     public void split() {
-        Random rnd = new Random();
+        Random rnd = new SecureRandom();
 
         samplesNo.clear();
         for (int k = 0; k < NUMBER_OF_INTERATIONS; k++) {
@@ -52,6 +53,8 @@ public class DatasetBootstrap extends Dataset {
             for (int i = 0; i < DataSet_T_Length; i++) {
                 samplesNo.get(k).add(rnd.nextInt(DataSet_T_Length));
             }
+
+            samplesNo.get(k).sort(Integer::compare);
         }
     }
 

@@ -8,7 +8,7 @@ import java.util.List;
 
 public class DatasetCross extends Dataset {
 
-    public static int NUMBER_OF_PARTS = 20;
+    public static int NUMBER_OF_PARTS = 5;
     private int iterationIndex = -1;
 
     /*
