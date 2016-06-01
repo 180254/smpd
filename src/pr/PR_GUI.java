@@ -6,7 +6,6 @@ import classifier.NearestMean;
 import classifier.NearestNeighbour;
 import classifier.enums.ClassifType;
 import classifier.enums.DistanceType;
-import classifier.enums.KdtUse;
 import classifier.sets.Dataset;
 import classifier.sets.DatasetBootstrap;
 import classifier.sets.DatasetCross;
@@ -296,9 +295,7 @@ public class PR_GUI extends javax.swing.JFrame {
         jComboBox2.setModel(new javax.swing.DefaultComboBoxModel(
                 new String[]{
                         "NN-euc",
-                        "NN-euc-kdim",
                         "k-NN-euc",
-                        "k-NN-euc-kdim",
                         "NM-euc",
                         "NM-moh",
                         "k-NM-euc",
@@ -543,34 +540,26 @@ public class PR_GUI extends javax.swing.JFrame {
 
         switch (jComboBox2.getSelectedIndex()) {
             case 0:
-                if (set) classifier = new NearestNeighbour(ds, ClassifType.One, KdtUse.False);
+                if (set) classifier = new NearestNeighbour(ds, ClassifType.One);
                 if (print) System.out.println("Ustawiono NearestNeighbour Euclidean");
                 break;
             case 1:
-                if (set) classifier = new NearestNeighbour(ds, ClassifType.One, KdtUse.True);
-                if (print) System.out.println("Ustawiono NearestNeighbour Euclidean K-Dim-Tree");
-                break;
-            case 2:
-                if (set) classifier = new NearestNeighbour(ds, ClassifType.K, KdtUse.False);
+                if (set) classifier = new NearestNeighbour(ds, ClassifType.K);
                 if (print) System.out.println("Ustawiono K-NearestNeighbour Euclidean");
                 break;
-            case 3:
-                if (set) classifier = new NearestNeighbour(ds, ClassifType.K, KdtUse.True);
-                if (print) System.out.println("Ustawiono K-NearestNeighbour Euclidean K-Dim-Tree");
-                break;
-            case 4:
+            case 2:
                 if (set) classifier = new NearestMean(ds, DistanceType.Euclidean, ClassifType.One);
                 if (print) System.out.println("Ustawiono NearestMean Euclidean");
                 break;
-            case 5:
+            case 3:
                 if (set) classifier = new NearestMean(ds, DistanceType.Mahalanobis, ClassifType.One);
                 if (print) System.out.println("Ustawiono NearestMean Mahalanobis");
                 break;
-            case 6:
+            case 4:
                 if (set) classifier = new NearestMean(ds, DistanceType.Euclidean, ClassifType.K);
                 if (print) System.out.println("Ustawiono K-NearestMean Euclidean");
                 break;
-            case 7:
+            case 5:
                 if (set) classifier = new NearestMean(ds, DistanceType.Mahalanobis, ClassifType.K);
                 if (print) System.out.println("Ustawiono K-NearestMean Mahalanobis");
                 break;
